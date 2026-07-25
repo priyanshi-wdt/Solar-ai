@@ -32,7 +32,7 @@ export default function VoiceAssistant() {
     >
       <h1>Solar Voice AI</h1>
 
-      <h3>{getStatus()}</h3>
+      {/* <h3>{getStatus()}</h3> */}
 {/* 
       {!started && (
         <button
