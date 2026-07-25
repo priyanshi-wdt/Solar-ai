@@ -1,6 +1,7 @@
-import useConversation from "../../hooks/useConversation.js";
-import ChatWindow from "../ChatWindow/ChatWindow";
 import { useEffect } from "react";
+import useConversation from "../../hooks/useConversation";
+import ChatWindow from "../ChatWindow/ChatWindow";
+
 export default function VoiceAssistant() {
   const {
     started,
@@ -11,16 +12,18 @@ export default function VoiceAssistant() {
     startConversation,
   } = useConversation();
 
-  // function getStatus() {
-  //   if (!connected) return "🔴 Disconnected";
-  //   if (speaking) return "🔊 AI Speaking...";
-  //   if (listening) return "🎤 Listening...";
-  //   return "😴 Waiting...";
-  // }
+  function getStatus() {
+    if (!connected) return "🔴 Disconnected";
+    if (speaking) return "🔊 AI Speaking...";
+    if (listening) return "🎤 Listening...";
+    return "😴 Waiting...";
+  }
 
   useEffect(() => {
+
     startConversation();
-  }, []);
+
+}, []);
 
   return (
     <div
@@ -32,9 +35,9 @@ export default function VoiceAssistant() {
     >
       <h1>Solar Voice AI</h1>
 
-      {/* <h3>{getStatus()}</h3> */}
-{/* 
-      {!started && (
+      <h3>{getStatus()}</h3>
+
+      {/* {!started && (
         <button
           onClick={startConversation}
           style={{

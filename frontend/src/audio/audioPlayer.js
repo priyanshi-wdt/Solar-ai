@@ -1,4 +1,4 @@
-// import conversationManager from "../conversation/conversationManager";
+// import ConversationManager from "../conversation/conversationManager";
 
 // let audioContext = null;
 // let nextPlayTime = 0;
@@ -64,7 +64,7 @@
 //   nextPlayTime += buffer.duration;
 
 //   // AI is speaking
-//   conversationManager.onAISpeaking();
+//   ConversationManager.onAISpeaking();
 
 //   // Reset finish timer whenever a new chunk arrives
 //   clearTimeout(finishTimer);
@@ -73,12 +73,12 @@
 
 //     nextPlayTime = ctx.currentTime;
 
-//     conversationManager.onAIFinished();
+//     ConversationManager.onAIFinished();
 
 //   }, 350);
 // }
 
-import conversationManager from "../conversation/conversationManager";
+import ConversationManager from "../conversation/conversationManager";
 
 let currentSource = null;
 let audioContext = null;
@@ -111,8 +111,8 @@ function playNext() {
   if (audioQueue.length === 0) {
     isPlaying = false;
 
-    if (conversationManager.turnComplete) {
-      conversationManager.onAIFinished();
+    if (ConversationManager.turnComplete) {
+      ConversationManager.onAIFinished();
     }
 
     return;

@@ -1,29 +1,26 @@
-import conversationManager from "../conversation/conversationManager";
+import ConversationManager from "../conversation/ConversationManager";
 import { playPCM, stopAudio } from "../audio/audioPlayer";
 import { companyId } from "../config/company";
-
 
 let socket = null;
 
 export async function connectWebSocket() {
   return new Promise((resolve, reject) => {
-    if (
-      socket &&
-      socket.readyState === WebSocket.OPEN
-    ) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
       resolve(socket);
       return;
     }
 
-    // socket = new WebSocket("ws://");
-    socket = new WebSocket("wss://solar-ai-ufc1.onrender.com?companyId=" + companyId);
+    socket = new WebSocket(
+      "wss://solar-ai-ufc1.onrender.com?companyId=" + companyId
+    );
 
     socket.binaryType = "arraybuffer";
 
     socket.onopen = () => {
       console.log("✅ WebSocket Connected");
 
-      conversationManager.setConnected(true);
+      ConversationManager.setConnected(true);
 
       resolve(socket);
     };
@@ -37,7 +34,7 @@ export async function connectWebSocket() {
     socket.onclose = () => {
       console.log("❌ WebSocket Closed");
 
-      conversationManager.setConnected(false);
+      ConversationManager.setConnected(false);
 
       socket = null;
     };
@@ -46,51 +43,39 @@ export async function connectWebSocket() {
       const message = JSON.parse(event.data);
 
       switch (message.type) {
-
         case "TEXT":
-
           console.log("🤖", message.text);
 
-          conversationManager.addAIMessage(
-            message.text
-          );
+          ConversationManager.addAIMessage(message.text);
 
           break;
 
         case "AUDIO":
-
-          conversationManager.onAISpeaking();
+          ConversationManager.onAISpeaking();
 
           playPCM(message.data);
 
           break;
 
         case "TURN_COMPLETE":
-
-          conversationManager.onAIFinished();
+          ConversationManager.onAIFinished();
 
           break;
 
         case "INTERRUPTED":
-
           stopAudio();
 
-          conversationManager.onInterrupted();
+          ConversationManager.onInterrupted();
 
           break;
 
         case "PONG":
-
           console.log("🏓 Pong");
 
           break;
 
         default:
-
-          console.log(
-            "Unknown Message:",
-            message
-          );
+          console.log("Unknown Message:", message);
       }
     };
   });
@@ -101,14 +86,11 @@ export async function connectWebSocket() {
 // ----------------------------
 
 export function sendAudioChunk(buffer) {
-
   if (!socket) return;
 
-  if (socket.readyState !== WebSocket.OPEN)
-    return;
+  if (socket.readyState !== WebSocket.OPEN) return;
 
   socket.send(buffer);
-
 }
 
 // ----------------------------
@@ -116,15 +98,13 @@ export function sendAudioChunk(buffer) {
 // ----------------------------
 
 export function endAudioStream() {
-
   if (!socket) return;
 
   socket.send(
     JSON.stringify({
       type: "AUDIO_END",
-    })
+    }),
   );
-
 }
 
 // ----------------------------
@@ -132,15 +112,16 @@ export function endAudioStream() {
 // ----------------------------
 
 export function startSession() {
-
   if (!socket) return;
 
   socket.send(
     JSON.stringify({
       type: "START_SESSION",
-    })
-  );
 
+      // tell Gemini to speak first
+      greeting: true,
+    }),
+  );
 }
 
 // ----------------------------
@@ -148,18 +129,11 @@ export function startSession() {
 // ----------------------------
 
 export function disconnectWebSocket() {
-
   if (!socket) return;
 
   socket.close();
-
 }
 
 export function isConnected() {
-
-  return (
-    socket &&
-    socket.readyState === WebSocket.OPEN
-  );
-
+  return socket && socket.readyState === WebSocket.OPEN;
 }

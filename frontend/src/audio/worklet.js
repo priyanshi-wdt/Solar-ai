@@ -31,7 +31,7 @@ export async function startWorklet() {
   );
 
   await audioContext.audioWorklet.addModule(
-    "/recorder.worklet.js"
+    "/src/audio/recorder.worklet.js"
   );
 
   sourceNode =

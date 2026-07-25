@@ -11,7 +11,6 @@ const { handleAudioMessage } = require("./audioRouter");
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
-
 function startWebSocketServer(server) {
   // connectDB()
   //   .then(async () => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import conversationManager from "../conversation/conversationManager";
+import ConversationManager from "../conversation/ConversationManager";
 
 import {
   connectWebSocket,
@@ -12,13 +12,13 @@ import { startWorklet } from "../audio/worklet";
 export default function useConversation() {
 
   const [state, setState] = useState(
-    conversationManager.getState()
+    ConversationManager.getState()
   );
 
   useEffect(() => {
 
     const unsubscribe =
-      conversationManager.subscribe(setState);
+      ConversationManager.subscribe(setState);
 
     return () => {
       unsubscribe();
@@ -39,9 +39,9 @@ export default function useConversation() {
       await startWorklet();
 
       // 3. Update State
-      conversationManager.startConversation();
+      ConversationManager.startConversation();
 
-      conversationManager.setListening(true);
+      ConversationManager.setListening(true);
 
       // 4. Create Gemini Session
       startSession();

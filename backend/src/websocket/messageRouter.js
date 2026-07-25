@@ -6,38 +6,32 @@ async function messageRouter(socket, message) {
     const data = JSON.parse(message);
 
     switch (data.type) {
-
       // ----------------------------------
       // Start Voice Session
       // ----------------------------------
-     case "START_SESSION": {
+      case "START_SESSION": {
+        console.log("🟢 START_SESSION");
 
-  console.log("🟢 START_SESSION");
+        const companyId = socket.companyId || "abc-solar";
 
-  const companyId = data.companyId || "abc-solar";
+        console.log("🏢 Company:", companyId);
 
-  socket.companyId = companyId;
-
-  console.log("🏢 Company:", companyId);
-
-  await GeminiAdapter.get(socket);
-
-  return;
-}
+        await GeminiAdapter.get(
+          socket,
+          companyId
+        );
+        return;
+      }
 
       // ----------------------------------
       // User Text Message
       // ----------------------------------
       case "TEXT": {
-
         if (!data.text) return;
 
         console.log("👤 User:", data.text);
 
-        await GeminiAdapter.sendText(
-          socket,
-          data.text
-        );
+        await GeminiAdapter.sendText(socket, data.text);
 
         return;
       }
@@ -46,7 +40,6 @@ async function messageRouter(socket, message) {
       // Audio Stream Finished
       // ----------------------------------
       case "AUDIO_END": {
-
         console.log("🎤 AUDIO_END");
 
         GeminiAdapter.signalAudioStreamEnd(socket);
@@ -58,11 +51,10 @@ async function messageRouter(socket, message) {
       // Ping (optional)
       // ----------------------------------
       case "PING": {
-
         socket.send(
           JSON.stringify({
             type: "PONG",
-          })
+          }),
         );
 
         return;
@@ -72,19 +64,13 @@ async function messageRouter(socket, message) {
       // Unknown Message
       // ----------------------------------
       default: {
-
-        console.log(
-          "⚠ Unknown Message:",
-          data.type
-        );
+        console.log("⚠ Unknown Message:", data.type);
 
         return;
       }
     }
   } catch (err) {
-    console.error(
-      "❌ Message Router Error:"
-    );
+    console.error("❌ Message Router Error:");
 
     console.error(err);
   }

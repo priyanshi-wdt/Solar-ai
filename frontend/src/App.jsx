@@ -1,4 +1,4 @@
-import VoiceAssistant from "./components/VoiceAssistant/VoiceAssistant.jsx";
+import VoiceAssistant from "./components/VoiceAssistant/VoiceAssistant";
 
 function App() {
     return <VoiceAssistant />;
