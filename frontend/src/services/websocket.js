@@ -1,4 +1,4 @@
-import ConversationManager from "../conversation/conversationManager";
+import conversationManager from "../conversation/conversationManager";
 import { playPCM, stopAudio } from "../audio/audioPlayer";
 
 let socket = null;

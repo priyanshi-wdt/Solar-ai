@@ -1,4 +1,4 @@
-// import ConversationManager from "../conversation/conversationManager";
+// import conversationManager from "../conversation/conversationManager";
 
 // let audioContext = null;
 // let nextPlayTime = 0;
@@ -78,7 +78,7 @@
 //   }, 350);
 // }
 
-import ConversationManager from "../conversation/conversationManager";
+import conversationManager from "../conversation/conversationManager";
 
 let currentSource = null;
 let audioContext = null;

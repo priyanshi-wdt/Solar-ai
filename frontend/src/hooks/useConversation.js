@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import ConversationManager from "../conversation/conversationManager";
+import conversationManager from "../conversation/conversationManager";
 
 import {
   connectWebSocket,
