@@ -36,7 +36,9 @@ window.SolarAI = {
             iframe.style.left = "-9999px";
 
             iframe.allow = "microphone";
-            iframe.src = "https://solar-ai-livid.vercel.app?companyId=" + config.companyId;
+            // iframe.src = "https://solar-ai-livid.vercel.app?companyId=" + config.companyId;
+             iframe.src =
+                `https://restaurant-ai-qp3u.vercel.app/?companyId=${config.companyId}`;
 
             document.body.appendChild(iframe);
         };
