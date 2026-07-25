@@ -1,6 +1,6 @@
 import useConversation from "../../hooks/useConversation.js";
 import ChatWindow from "../ChatWindow/ChatWindow";
-
+import { useEffect } from "react";
 export default function VoiceAssistant() {
   const {
     started,
