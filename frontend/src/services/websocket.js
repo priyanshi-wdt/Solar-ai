@@ -13,7 +13,8 @@ export async function connectWebSocket() {
       return;
     }
 
-    socket = new WebSocket("ws://localhost:5000");
+    // socket = new WebSocket("ws://");
+    socket = new WebSocket("wss://solar-ai-ufc1.onrender.com?companyId=" + companyId);
 
     socket.binaryType = "arraybuffer";
 

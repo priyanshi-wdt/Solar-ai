@@ -9,6 +9,9 @@ const GeminiAdapter = require("./geminiAdapter");
 
 const { handleAudioMessage } = require("./audioRouter");
 
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+
+
 function startWebSocketServer(server) {
   // connectDB()
   //   .then(async () => {
@@ -44,8 +47,31 @@ function startWebSocketServer(server) {
     server,
   });
 
-  wss.on("connection", (socket) => {
-    console.log("✅ Frontend connected");
+  wss.on("connection", (socket,request) => {
+    const url = new URL(
+        request.url,
+        CLIENT_URL
+    );
+
+
+    const companyId =
+        url.searchParams.get(
+            "companyId"
+        );
+
+
+    socket.companyId = companyId;
+
+
+    console.log(
+        "✅ Frontend connected"
+    );
+
+
+    console.log(
+        "🏢 Company ID:",
+        companyId
+    );
 
     clientManager.add(socket);
 
