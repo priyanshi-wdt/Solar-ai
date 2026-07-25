@@ -1,0 +1,73 @@
+#solar-ai-button{
+
+    position:fixed;
+
+    right:25px;
+
+    bottom:25px;
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:50%;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    z-index:99999;
+
+}
+
+
+
+#solar-ai-popup{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:100px;
+
+    width:400px;
+
+    height:650px;
+
+    background:white;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 30px #0004;
+
+    z-index:99999;
+
+}
+
+
+
+#solar-ai-close{
+
+    position:absolute;
+
+    right:10px;
+
+    top:10px;
+
+    z-index:2;
+
+}
+
+
+
+#solar-ai-frame{
+
+    width:100%;
+
+    height:100%;
+
+    border:none;
+
+}
