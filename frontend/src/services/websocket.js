@@ -1,5 +1,7 @@
 import conversationManager from "../conversation/conversationManager";
 import { playPCM, stopAudio } from "../audio/audioPlayer";
+import { companyId } from "../config/company";
+
 
 let socket = null;
 
