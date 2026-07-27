@@ -10,6 +10,7 @@ export default function VoiceAssistant() {
     speaking,
     messages,
     startConversation,
+    endConversation,
   } = useConversation();
 
   function getStatus() {
@@ -20,10 +21,20 @@ export default function VoiceAssistant() {
   }
 
   useEffect(() => {
-
     startConversation();
+  }, []);
 
-}, []);
+  useEffect(() => {
+    function handleMessage(event) {
+      if (event.data?.type === "VOICE_AI_END") {
+        endConversation();
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   return (
     <div
