@@ -27,8 +27,8 @@ window.SolarAI = {
                 iframe.style.display = "none";
                 iframe.allow = "microphone";
 
-                iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
-                // iframe.src = `http://localhost:5173/?companyId=${config.companyId}`;
+                // iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+                iframe.src = `http://localhost:5173/?companyId=${config.companyId}`;
 
                 document.body.appendChild(iframe);
             } else {
