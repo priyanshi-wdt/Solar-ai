@@ -1,4 +1,4 @@
-class ConversationManager {
+class conversationManager {
   constructor() {
     this.started = false;
     this.connected = false;
@@ -113,4 +113,4 @@ class ConversationManager {
   }
 }
 
-export default new ConversationManager();
+export default new conversationManager();

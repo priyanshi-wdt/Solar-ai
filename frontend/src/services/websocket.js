@@ -1,4 +1,4 @@
-import ConversationManager from "../conversation/ConversationManager";
+import conversationManager from "../conversation/conversationManager";
 import { playPCM, stopAudio } from "../audio/audioPlayer";
 import { companyId } from "../config/company";
 
@@ -20,7 +20,7 @@ export async function connectWebSocket() {
     socket.onopen = () => {
       console.log("✅ WebSocket Connected");
 
-      ConversationManager.setConnected(true);
+      conversationManager.setConnected(true);
 
       resolve(socket);
     };
@@ -34,7 +34,7 @@ export async function connectWebSocket() {
     socket.onclose = () => {
       console.log("❌ WebSocket Closed");
 
-      ConversationManager.setConnected(false);
+      conversationManager.setConnected(false);
 
       socket = null;
     };
@@ -46,26 +46,26 @@ export async function connectWebSocket() {
         case "TEXT":
           console.log("🤖", message.text);
 
-          ConversationManager.addAIMessage(message.text);
+          conversationManager.addAIMessage(message.text);
 
           break;
 
         case "AUDIO":
-          ConversationManager.onAISpeaking();
+          conversationManager.onAISpeaking();
 
           playPCM(message.data);
 
           break;
 
         case "TURN_COMPLETE":
-          ConversationManager.onAIFinished();
+          conversationManager.onAIFinished();
 
           break;
 
         case "INTERRUPTED":
           stopAudio();
 
-          ConversationManager.onInterrupted();
+          conversationManager.onInterrupted();
 
           break;
 
@@ -121,6 +121,16 @@ export function startSession() {
       // tell Gemini to speak first
       greeting: true,
     }),
+  );
+}
+
+export function stopSession() {
+  if (!socket) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "STOP_SESSION",
+    })
   );
 }
 

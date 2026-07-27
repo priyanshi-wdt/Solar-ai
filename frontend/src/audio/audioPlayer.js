@@ -1,4 +1,4 @@
-import ConversationManager from "../conversation/conversationManager";
+import conversationManager from "../conversation/conversationManager";
 
 let currentSource = null;
 let audioContext = null;
@@ -40,8 +40,8 @@ function playNext() {
   if (audioQueue.length === 0) {
     isPlaying = false;
 
-    if (ConversationManager.turnComplete) {
-      ConversationManager.onAIFinished();
+    if (conversationManager.turnComplete) {
+      conversationManager.onAIFinished();
     }
 
     return;
@@ -79,8 +79,12 @@ function playNext() {
   source.connect(ctx.destination);
 
   source.onended = () => {
+    if (stopped) return;
+
+    currentSource = null;
+
     playNext();
-  };
+};
 
   source.start();
 }

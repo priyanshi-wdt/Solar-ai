@@ -1,61 +1,67 @@
 window.SolarAI = {
-  init(config = {}) {
-    console.log("SolarAI Started", config);
+    init(config = {}) {
+        console.log("SolarAI Started", config);
 
-    const button = document.createElement("button");
+        const button = document.createElement("button");
 
-    button.id = "solar-ai-button";
+        button.id = "solar-ai-button";
 
-    button.innerHTML = "🎤";
+        button.innerHTML = "🎤";
 
-    document.body.appendChild(button);
+        document.body.appendChild(button);
 
-    let iframe = null;
-    let started = false;
+        let iframe = null;
+        let started = false;
 
-    button.onclick = () => {
-      if (!started) {
-        started = true;
+        window.addEventListener("message", (event) => {
+            console.log("Received message:", event.data);
+            if (event.data?.type !== "VOICE_AI_STATE") return;
+        });
 
-        iframe = document.createElement("iframe");
+        button.onclick = () => {
+            if (!started) {
+                started = true;
 
-        iframe.style.display = "none";
-        iframe.allow = "microphone";
+                iframe = document.createElement("iframe");
 
-        iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+                iframe.style.display = "none";
+                iframe.allow = "microphone";
 
-        document.body.appendChild(iframe);
-      } else {
-        started = false;
+                iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+                // iframe.src = `http://localhost:5173/?companyId=${config.companyId}`;
 
-        iframe.contentWindow.postMessage(
-          {
-            type: "VOICE_AI_END",
-          },
-          "*",
-        );
-      }
+                document.body.appendChild(iframe);
+            } else {
+                started = false;
 
-      // button.onclick = () => {
-      //     if (started) return;
+                iframe.contentWindow.postMessage(
+                    {
+                        type: "VOICE_AI_END",
+                    },
+                    "*",
+                );
+            }
 
-      //     started = true;
+            // button.onclick = () => {
+            //     if (started) return;
 
-      //     const iframe = document.createElement("iframe");
+            //     started = true;
 
-      //     iframe.style.width = "0";
-      //     iframe.style.height = "0";
-      //     iframe.style.border = "0";
-      //     iframe.style.position = "absolute";
-      //     iframe.style.left = "-9999px";
+            //     const iframe = document.createElement("iframe");
 
-      //     iframe.allow = "microphone";
-      //     // iframe.src = "https://solar-ai-livid.vercel.app?companyId=" + config.companyId;
-      //      iframe.src =
-      //         `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+            //     iframe.style.width = "0";
+            //     iframe.style.height = "0";
+            //     iframe.style.border = "0";
+            //     iframe.style.position = "absolute";
+            //     iframe.style.left = "-9999px";
 
-      //     document.body.appendChild(iframe);
-      // };
-    };
-  },
+            //     iframe.allow = "microphone";
+            //     // iframe.src = "https://solar-ai-livid.vercel.app?companyId=" + config.companyId;
+            //      iframe.src =
+            //         `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+
+            //     document.body.appendChild(iframe);
+            // };
+        };
+    },
 };
