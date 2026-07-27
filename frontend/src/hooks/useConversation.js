@@ -28,34 +28,55 @@ export default function useConversation() {
 
   }, []);
 
-  async function startConversation() {
+  // async function startConversation() {
 
-    if (state.started) return;
+  //   if (state.started) return;
 
-    try {
+  //   try {
 
-      // 1. Connect Backend
-      await connectWebSocket();
+  //     // 1. Connect Backend
+  //     await connectWebSocket();
 
-      // 2. Open Microphone
-      await startWorklet();
+  //     // 2. Open Microphone
+  //     await startWorklet();
 
-      // 3. Update State
-      conversationManager.startConversation();
+  //     // 3. Update State
+  //     conversationManager.startConversation();
 
-      conversationManager.setListening(true);
+  //     conversationManager.setListening(true);
 
-      // 4. Create Gemini Session
-      startSession();
+  //     // 4. Create Gemini Session
+  //     startSession();
 
-    } catch (err) {
+  //   } catch (err) {
 
-      console.error(err);
+  //     console.error(err);
 
-    }
+  //   }
 
+  // }
+
+ async function startConversation() {
+  if (state.started) return;
+
+  try {
+    // 1. Ask for microphone permission first
+    await startWorklet();
+
+    // 2. Connect backend while permission is already granted
+    await connectWebSocket();
+
+    // 3. Update state
+    conversationManager.startConversation();
+    conversationManager.setListening(true);
+
+    // 4. Start Gemini session
+    startSession();
+
+  } catch (err) {
+    console.error(err);
   }
-
+}
   function endConversation() {
     stopAudio();                  // Stop AI voice immediately
     stopWorklet();                // Stop microphone

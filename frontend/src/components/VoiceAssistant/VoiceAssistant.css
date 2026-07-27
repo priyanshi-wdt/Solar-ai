@@ -1,4 +1,4 @@
-.assistant-container {
+/* .assistant-container {
 
     width: 420px;
 
@@ -22,4 +22,46 @@
 
     font-size:30px;
 
+} */
+
+.loader {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  animation: solar-spin 0.8s linear infinite;
+}
+
+@keyframes solar-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+.equalizer{
+    display:flex;
+    gap:4px;
+}
+
+.equalizer span{
+    width:4px;
+    background:#fff;
+    border-radius:10px;
+    animation:bars .45s infinite alternate;
+}
+
+.equalizer span:nth-child(1){animation-delay:0s;}
+.equalizer span:nth-child(2){animation-delay:.1s;}
+.equalizer span:nth-child(3){animation-delay:.2s;}
+.equalizer span:nth-child(4){animation-delay:.3s;}
+
+@keyframes bars{
+    from{
+        height:8px;
+    }
+    to{
+        height:24px;
+    }
 }
