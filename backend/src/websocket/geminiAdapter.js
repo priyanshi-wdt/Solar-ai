@@ -93,8 +93,8 @@ class GeminiAdapter {
           console.log("✅ Gemini Connected");
         },
 
-        onmessage: (message) => {
-          this.handleMessage(socket, message);
+        onmessage: async (message) => {
+          await this.handleMessage(socket, message);
         },
 
         onclose: (event) => {
@@ -164,7 +164,7 @@ class GeminiAdapter {
     const session = await this.get(socket);
 
     // Typed messages are already text, log immediately.
-    conversationStore.append(socket, "user", text, "text");
+    await conversationStore.append(socket, "user", text, "text");
 
     session.sendClientContent({
       turns: [
@@ -184,7 +184,7 @@ class GeminiAdapter {
     session.sendRealtimeInput({ audioStreamEnd: true });
   }
 
-  handleMessage(socket, message) {
+  async handleMessage(socket, message) {
     if (message.setupComplete) {
       return;
     }
@@ -219,7 +219,7 @@ class GeminiAdapter {
       if (part.text) {
         console.log("🤖", part.text);
 
-        conversationStore.append(socket, "assistant", part.text, "text");
+        // conversationStore.append(socket, "assistant", part.text, "text");
 
         socket.send(
           JSON.stringify({
@@ -247,10 +247,10 @@ class GeminiAdapter {
       const aiText = this.outputBuffers.get(socket);
 
       if (userText) {
-        conversationStore.append(socket, "user", userText, "voice");
+        await conversationStore.append(socket, "user", userText, "voice");
       }
       if (aiText) {
-        conversationStore.append(socket, "assistant", aiText, "voice");
+        await conversationStore.append(socket, "assistant", aiText, "voice");
       }
 
       this.inputBuffers.delete(socket);
@@ -260,10 +260,10 @@ class GeminiAdapter {
     }
   }
 
-  close(socket) {
+  async close(socket) {
     const session = this.sessions.get(socket);
 
-    conversationStore.end(socket);
+    await conversationStore.end(socket);
 
     if (!session) return;
 
