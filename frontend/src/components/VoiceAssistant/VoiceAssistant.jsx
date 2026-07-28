@@ -69,6 +69,9 @@
 import { useEffect, useState } from "react";
 import useConversation from "../../hooks/useConversation";
 import "./VoiceAssistant.css";
+import Kristin from "../../assets/images/Kristin.jpg";
+
+
 
 export default function VoiceAssistant() {
   const {
@@ -114,28 +117,25 @@ export default function VoiceAssistant() {
     }
   };
 
+
   return (
     <>
       {/* Floating Button */}
       <button
         onClick={handleButtonClick}
-        style={{
-          width: "70px",
-          height: "70px",
-          borderRadius: "50%",
-          border: "none",
-          background: "#ff6b35",
-          color: "#fff",
-          fontSize: "30px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        className={`voice-button ${speaking ? "ai-speaking" : ""}`}
       >
         {loading ? (
           <div className="loader" />
-        ) : started ? (
+        ) : speaking ? (
+          // AI is talking 
+        <>
+          {speaking && <span className="ring"></span>}
+
+          <img src={Kristin} className="avatar" />
+        </>
+        ) : listening ? (
+          // User is talking
           <div className="equalizer">
             <span></span>
             <span></span>
@@ -143,6 +143,7 @@ export default function VoiceAssistant() {
             <span></span>
           </div>
         ) : (
+          // Waiting
           <svg
             width="28"
             height="28"

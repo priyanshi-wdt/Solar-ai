@@ -25,43 +25,107 @@
 } */
 
 .loader {
-  width: 28px;
-  height: 28px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid #fff;
-  border-radius: 50%;
-  animation: solar-spin 0.8s linear infinite;
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    animation: solar-spin 0.8s linear infinite;
 }
 
 @keyframes solar-spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-
-.equalizer{
-    display:flex;
-    gap:4px;
-}
-
-.equalizer span{
-    width:4px;
-    background:#fff;
-    border-radius:10px;
-    animation:bars .45s infinite alternate;
-}
-
-.equalizer span:nth-child(1){animation-delay:0s;}
-.equalizer span:nth-child(2){animation-delay:.1s;}
-.equalizer span:nth-child(3){animation-delay:.2s;}
-.equalizer span:nth-child(4){animation-delay:.3s;}
-
-@keyframes bars{
-    from{
-        height:8px;
+    100% {
+        transform: rotate(360deg);
     }
-    to{
-        height:24px;
+}
+
+
+.equalizer {
+    display: flex;
+    gap: 4px;
+}
+
+.equalizer span {
+    width: 4px;
+    background: #fff;
+    border-radius: 10px;
+    animation: bars .45s infinite alternate;
+}
+
+.equalizer span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.equalizer span:nth-child(2) {
+    animation-delay: .1s;
+}
+
+.equalizer span:nth-child(3) {
+    animation-delay: .2s;
+}
+
+.equalizer span:nth-child(4) {
+    animation-delay: .3s;
+}
+
+@keyframes bars {
+    from {
+        height: 8px;
+    }
+
+    to {
+        height: 24px;
+    }
+}
+
+.voice-button {
+    width: 90px;
+    height: 90px;
+    border: none;
+    background: #ff6b35;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Avatar container */
+/* .avatar-wrapper {
+  width: 90px;
+  height: 90px;
+
+  border-radius: 50%;
+
+  background: #e56b3f;
+} */
+
+/* Image */
+
+.avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.ring {
+    position: absolute;
+    width: 60px;
+    height:60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    animation: ripple 1.5s linear infinite;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.40);
+        opacity: 0;
     }
 }

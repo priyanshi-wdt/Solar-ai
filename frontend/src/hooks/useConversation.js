@@ -82,6 +82,8 @@ export default function useConversation() {
     stopWorklet();                // Stop microphone
     disconnectWebSocket();        // Disconnect backend
 
+    stopAudio()
+    
     conversationManager.clearMessages();
     conversationManager.stopConversation();
 }
