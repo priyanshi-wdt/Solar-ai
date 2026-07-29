@@ -41,25 +41,40 @@ class ConversationStore {
     return this.sessionIds.get(socket);
   }
 
-  async append(socket, role, text, source = "text") {
-    if (!text || !text.trim()) return;
+  async append({
+  socket = null,
+  conversationId = null,
+  role,
+  text,
+  source = "text",
+}) {
+  if (!text || !text.trim()) return;
 
-    const sessionId = this.sessionIds.get(socket);
-    if (!sessionId) return; // conversation wasn't started, nothing to log
+  let sessionId = conversationId;
 
-    try {
-      await Conversation.updateOne(
-        { sessionId },
-        {
-          $push: {
-            messages: { role, text: text.trim(), source },
-          },
-        }
-      );
-    } catch (err) {
-      console.error("❌ Failed to append message:", err);
-    }
+  if (socket) {
+    sessionId = this.sessionIds.get(socket);
   }
+
+  if (!sessionId) return;
+
+  try {
+    await Conversation.updateOne(
+      { sessionId },
+      {
+        $push: {
+          messages: {
+            role,
+            text: text.trim(),
+            source,
+          },
+        },
+      }
+    );
+  } catch (err) {
+    console.error("❌ Failed to append message:", err);
+  }
+}
 
   async end(socket) {
     const sessionId = this.sessionIds.get(socket);

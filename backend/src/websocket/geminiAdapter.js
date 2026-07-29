@@ -168,7 +168,12 @@ class GeminiAdapter {
     const session = await this.get(socket);
 
     // Typed messages are already text, log immediately.
-    await conversationStore.append(socket, "user", text, "text");
+    await conversationStore.append({
+  socket,
+  role: "user",
+  text,
+  source: "text",
+});
 
     session.sendClientContent({
       turns: [
@@ -251,12 +256,22 @@ class GeminiAdapter {
       const aiText = this.outputBuffers.get(socket);
 
       if (userText) {
-        await conversationStore.append(socket, "user", userText, "voice");
-      }
-      if (aiText) {
-        await conversationStore.append(socket, "assistant", aiText, "voice");
+        await conversationStore.append({
+          socket,
+          role: "user",
+          text: userText,
+          source: "voice",
+        });
       }
 
+      if (aiText) {
+        await conversationStore.append({
+          socket,
+          role: "assistant",
+          text: aiText,
+          source: "voice",
+        });
+      }
       this.inputBuffers.delete(socket);
       this.outputBuffers.delete(socket);
 
