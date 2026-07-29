@@ -2,7 +2,7 @@ const { GoogleGenAI } = require("@google/genai");
 const buildPrompt = require("../prompts/buildPrompt");
 const { getCompany } = require("./companyService");
 
-const MODEL = "gemini-3.1-flash";
+const MODEL = "gemini-3-flash-preview";
 
 class GeminiChatService {
   constructor() {
