@@ -27,6 +27,19 @@ class ConversationStore {
     return sessionId;
   }
 
+  async startChatConversation(companyId) {
+  const sessionId = randomUUID();
+
+  const conversation = await Conversation.create({
+    sessionId,
+    conversationType: "chat",
+    messages: [],
+    status: "active",
+  });
+
+  return conversation;
+}
+
   getSessionId(socket) {
     return this.sessionIds.get(socket);
   }

@@ -23,16 +23,26 @@ const messageSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const conversationSchema = new mongoose.Schema({
   // one conversation per websocket connection/session
+  companyId: {
+    type: String,
+    required: true,
+    index: true,
+  },
   sessionId: {
     type: String,
     required: true,
     unique: true,
     index: true,
+  },
+  conversationType: {
+    type: String,
+    enum: ["voice", "chat"],
+    default: "voice",
   },
   messages: {
     type: [messageSchema],

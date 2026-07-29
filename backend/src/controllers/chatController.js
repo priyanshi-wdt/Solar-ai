@@ -1,4 +1,33 @@
 const geminiChatService = require("../services/geminiChat.service");
+const conversationStore = require("../services/conversationStore");
+
+async function startConversation(req, res) {
+  try {
+    const { companyId } = req.body;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "companyId is required",
+      });
+    }
+
+    const conversation =
+      await conversationStore.startChatConversation(companyId);
+
+    return res.json({
+      success: true,
+      conversationId: conversation.sessionId,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
 
 async function sendMessage(req, res) {
   try {
@@ -40,4 +69,5 @@ async function sendMessage(req, res) {
 
 module.exports = {
   sendMessage,
+  startConversation
 };
