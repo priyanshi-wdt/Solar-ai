@@ -34,7 +34,7 @@ async function startConversation(req, res) {
 
 async function sendMessage(req, res) {
   try {
-    const { companyId, message } = req.body;
+    const { conversationId, message } = req.body;
 
     const conversation = await Conversation.findOne({
       sessionId: conversationId,
