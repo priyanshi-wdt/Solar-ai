@@ -1,5 +1,6 @@
 const geminiChatService = require("../services/geminiChat.service");
 const conversationStore = require("../services/conversationStore");
+const Conversation = require("../models/Conversation");
 
 async function startConversation(req, res) {
   try {
@@ -60,11 +61,25 @@ async function sendMessage(req, res) {
       });
     }
 
+    await conversationStore.append({
+      conversationId,
+      role: "user",
+      text: message,
+      source: "text",
+    });
+
     const reply = await geminiChatService.sendMessage(
-      companyId,
+      conversation.companyId,
       message,
-      history
+      conversation,
     );
+
+    await conversationStore.append({
+      conversationId,
+      role: "assistant",
+      text: reply,
+      source: "text",
+    });
 
     return res.json({
       success: true,
@@ -82,5 +97,5 @@ async function sendMessage(req, res) {
 
 module.exports = {
   sendMessage,
-  startConversation
+  startConversation,
 };

@@ -11,7 +11,7 @@ class GeminiChatService {
     });
   }
 
-  async sendMessage(companyId, message, history = []) {
+  async sendMessage(companyId, message, conversation) {
     const company = await getCompany(companyId);
 
     if (!company) {
@@ -20,17 +20,11 @@ class GeminiChatService {
 
     const prompt = buildPrompt(company);
 
-    const contents = [];
+    const contents = conversation.messages.map((msg) => ({
+      role: msg.role,
+      parts: [{ text: msg.text }],
+    }));
 
-    // Add previous chat messages
-    for (const msg of history) {
-      contents.push({
-        role: msg.role,
-        parts: [{ text: msg.text }],
-      });
-    }
-
-    // Add current user message
     contents.push({
       role: "user",
       parts: [{ text: message }],
