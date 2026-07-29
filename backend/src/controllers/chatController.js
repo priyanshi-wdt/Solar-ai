@@ -12,12 +12,14 @@ async function startConversation(req, res) {
       });
     }
 
-    const conversation =
-      await conversationStore.startChatConversation(companyId);
+    const conversationId = await conversationStore.start({
+      companyId,
+      conversationType: "chat",
+    });
 
     return res.json({
       success: true,
-      conversationId: conversation.sessionId,
+      conversationId,
     });
   } catch (error) {
     console.error(error);
@@ -31,14 +33,25 @@ async function startConversation(req, res) {
 
 async function sendMessage(req, res) {
   try {
-    const { companyId, message, history = [] } = req.body;
+    const { companyId, message } = req.body;
 
-    if (!companyId) {
-      return res.status(400).json({
+    const conversation = await Conversation.findOne({
+      sessionId: conversationId,
+    });
+
+    if (!conversation) {
+      return res.status(404).json({
         success: false,
-        message: "companyId is required",
+        message: "Conversation not found",
       });
     }
+
+    // if (!companyId) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "companyId is required",
+    //   });
+    // }
 
     if (!message) {
       return res.status(400).json({

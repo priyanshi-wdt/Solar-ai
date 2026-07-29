@@ -7,39 +7,35 @@ class ConversationStore {
     this.sessionIds = new Map();
   }
 
-  async start(socket) {
-    const sessionId = randomUUID();
+  async start({
+  socket = null,
+  companyId,
+  conversationType = "voice",
+}) {
+  const sessionId = randomUUID();
 
+  if (socket) {
     this.sessionIds.set(socket, sessionId);
-
-    try {
-      await Conversation.create({
-        sessionId,
-        messages: [],
-        status: "active",
-      });
-
-      console.log("🗄️  Conversation started:", sessionId);
-    } catch (err) {
-      console.error("❌ Failed to create conversation doc:", err);
-    }
-
-    return sessionId;
   }
 
-  async startChatConversation(companyId) {
-    const sessionId = randomUUID();
-
-    const conversation = await Conversation.create({
+  try {
+    await Conversation.create({
       companyId,
       sessionId,
-      conversationType: "chat",
+      conversationType,
       messages: [],
       status: "active",
     });
 
-    return conversation;
+    console.log("🗄️ Conversation started:", sessionId);
+  } catch (err) {
+    console.error("❌ Failed to create conversation:", err);
   }
+
+  return sessionId;
+}
+
+ 
 
   getSessionId(socket) {
     return this.sessionIds.get(socket);

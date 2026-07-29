@@ -42,7 +42,11 @@ class GeminiAdapter {
     const prompt = buildPrompt(company);
     // Start the DB conversation record before Gemini connects so
     // there's no race between the greeting message and logging it.
-    await conversationStore.start(socket);
+    await conversationStore.start({
+      socket,
+      companyId,
+      conversationType: "voice",
+    });
 
     const session = await this.ai.live.connect({
       model: MODEL,
