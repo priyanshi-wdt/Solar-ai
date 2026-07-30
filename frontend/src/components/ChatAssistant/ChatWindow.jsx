@@ -3,6 +3,7 @@ import "./ChatAssistant.css";
 import { companyId } from "../../config/company";
 import { startChat, sendChatMessage } from "../../services/chat";
 import { useRef } from "react";
+import ChatTyping from "./ChatTyping";
 
 const API_URL = "https://solar-ai-ufc1.onrender.com";
 
@@ -123,7 +124,7 @@ export default function ChatWindow({ onClose }) {
         ))}
 
 
-        {loading && <div className="chat-message assistant">Typing...</div>}
+        {loading && <ChatTyping/>}
         <div ref={messagesEndRef} />
       </div>
 

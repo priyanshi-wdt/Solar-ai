@@ -35,13 +35,24 @@ async function startConversation(req, res) {
       greeting,
     });
   } catch (error) {
-    console.error(error);
+  console.error("Chat Error:", error);
 
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+  let message = "Sorry, something went wrong. Please try again.";
+
+  // Gemini quota exceeded
+  if (
+    error.message &&
+    error.message.includes("RESOURCE_EXHAUSTED")
+  ) {
+    message =
+      "I'm receiving a high number of requests right now. Please wait a few seconds and try again.";
   }
+
+  return res.status(500).json({
+    success: false,
+    message,
+  });
+}
 }
 
 async function sendMessage(req, res) {
