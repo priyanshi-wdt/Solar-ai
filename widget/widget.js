@@ -69,8 +69,8 @@
 window.SolarAI = {
     init(config = {}) {
         const iframe = document.createElement("iframe");
-        // iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
-        iframe.src = `http://localhost:5173/?companyId=${config.companyId}`;
+        iframe.src = `https://solar-ai-livid.vercel.app/?companyId=${config.companyId}`;
+        // iframe.src = `http://localhost:5173/?companyId=${config.companyId}`;
         iframe.allow = "microphone";
         iframe.style.position = "fixed";
         iframe.style.bottom = "20px";
@@ -79,7 +79,7 @@ window.SolarAI = {
         iframe.style.height = "110px";
         iframe.style.padding = '10px',
             iframe.style.border = "none";
-        iframe.style.background = "red";
+        // iframe.style.background = "red";
 
         document.body.appendChild(iframe);
         window.addEventListener("message", (event) => {
