@@ -58,6 +58,8 @@ export default function ChatWindow({ onClose }) {
   }, [messages]);
 
   async function startConversation() {
+    setLoading(true);
+
     try {
       const data = await startChat();
 
@@ -73,8 +75,12 @@ export default function ChatWindow({ onClose }) {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   }
+
+ 
 
   async function sendMessage() {
     if (!input.trim()) return;
