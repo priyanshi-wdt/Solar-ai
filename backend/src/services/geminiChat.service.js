@@ -40,6 +40,35 @@ class GeminiChatService {
 
     return response.text;
   }
+
+  async startConversation(companyId) {
+    const company = await getCompany(companyId);
+
+    if (!company) {
+      throw new Error(`Company not found: ${companyId}`);
+    }
+
+    const prompt = buildPrompt(company);
+
+    const response = await this.ai.models.generateContent({
+      model: MODEL,
+      config: {
+        systemInstruction: prompt,
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: "The customer has just connected. Greet them first.",
+            },
+          ],
+        },
+      ],
+    });
+
+    return response.text;
+  }
 }
 
 module.exports = new GeminiChatService();

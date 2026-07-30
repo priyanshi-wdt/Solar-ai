@@ -18,9 +18,21 @@ async function startConversation(req, res) {
       conversationType: "chat",
     });
 
+    // Ask Gemini for the first greeting
+    const greeting = await geminiChatService.startConversation(companyId);
+
+    // Save greeting to MongoDB
+    await conversationStore.append({
+      conversationId,
+      role: "assistant",
+      text: greeting,
+      source: "text",
+    });
+
     return res.json({
       success: true,
       conversationId,
+      greeting,
     });
   } catch (error) {
     console.error(error);

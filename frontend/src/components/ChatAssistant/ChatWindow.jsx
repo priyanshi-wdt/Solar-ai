@@ -1,123 +1,145 @@
-import { useEffect, useRef, useState } from "react";
-import ChatMessage from "./ChatMessage";
-import ChatInput from "./ChatInput";
+import { useEffect, useState } from "react";
+import "./ChatAssistant.css";
+import { companyId } from "../../config/company";
+import { startChat, sendChatMessage } from "../../services/chat";
+import { useRef } from "react";
 
-const API = "https://solar-ai-ufc1.onrender.com/api/chat";
+const API_URL = "https://solar-ai-ufc1.onrender.com";
 
 export default function ChatWindow({ onClose }) {
+  const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const bottomRef = useRef(null);
-
+  const messagesEndRef = useRef(null);
   useEffect(() => {
     startConversation();
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [messages]);
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
 
   async function startConversation() {
+  try {
+    const data = await startChat();
 
-  console.log("startConversation called");
-
-    setLoading(true);
-
-    try {
-      const response = await fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          companyId: "abc-solar",
-          message: "The customer has just connected. Greet them first.",
-          history: [],
-        }),
-      });
-
-      const data = await response.json();
+    if (data.success) {
+      setConversationId(data.conversationId);
 
       setMessages([
         {
           role: "assistant",
-          text: data.reply,
+          text: data.greeting,
         },
       ]);
-    } catch (err) {
-      console.error(err);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+  async function sendMessage() {
+    if (!input.trim()) return;
+
+    if (!conversationId) {
+      console.error("Conversation not started.");
+      return;
     }
 
-    setLoading(false);
-  }
+    const userMessage = input.trim();
 
-  async function sendMessage(text) {
-    const userMessage = {
-      role: "user",
-      text,
-    };
+    // Show user's message immediately
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        text: userMessage,
+      },
+    ]);
 
-    const history = [...messages, userMessage];
+    // Clear input
+    setInput("");
 
-    setMessages(history);
     setLoading(true);
 
     try {
-      const response = await fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          companyId: "abc-solar",
-          message: text,
-          history,
-        }),
-      });
+      const data = await sendChatMessage(conversationId, userMessage);
 
-      const data = await response.json();
+      if (data.success) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            text: data.reply,
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            text: data.message || "Something went wrong.",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
 
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: data.reply,
+          text: "Unable to contact the server.",
         },
       ]);
-    } catch (err) {
-      console.error(err);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    setLoading(false);
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
   }
 
   return (
     <div className="chat-window">
-
       <div className="chat-header">
-        <span>Chat</span>
+        <span>Kristin</span>
 
         <button onClick={onClose}>✕</button>
       </div>
 
       <div className="chat-body">
-        {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message}
-          />
+        {messages.map((msg, index) => (
+          <div key={index} className={`chat-message ${msg.role}`}>
+            {msg.text}
+          </div>
         ))}
 
-        <div ref={bottomRef}></div>
+
+        {loading && <div className="chat-message assistant">Typing...</div>}
+        <div ref={messagesEndRef} />
       </div>
 
-      <ChatInput
-        onSend={sendMessage}
-        loading={loading}
-      />
+      <div className="chat-input">
+        <input
+          type="text"
+          placeholder="Type your message..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+
+        <button onClick={sendMessage} disabled={loading}>
+          Send
+        </button>
+      </div>
     </div>
   );
 }
