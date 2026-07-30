@@ -44,8 +44,8 @@ async function startConversation(req, res) {
     error.message &&
     error.message.includes("RESOURCE_EXHAUSTED")
   ) {
-    message =
-      "I'm receiving a high number of requests right now. Please wait a few seconds and try again.";
+    message =error.message
+      // "I'm receiving a high number of requests right now. Please wait a few seconds and try again.";
   }
 
   return res.status(500).json({
