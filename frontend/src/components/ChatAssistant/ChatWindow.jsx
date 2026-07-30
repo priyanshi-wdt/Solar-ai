@@ -10,6 +10,39 @@ const API_URL = "https://solar-ai-ufc1.onrender.com";
 export default function ChatWindow({ onClose }) {
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([
+  //   {
+  //     id: 1,
+  //     role: "assistant",
+  //     text: "Hi! I'm Kristin.",
+  //   },
+  //   {
+  //     id: 2,
+  //     role: "user",
+  //     text: "Hello",
+  //   },
+
+  //   {
+  //     id: 3,
+  //     role: "assistant",
+  //     text: "I'm here to help with your solar questions.",
+  //   },
+  //   {
+  //     id: 4,
+  //     role: "assistant",
+  //     text: "You can ask me about solar panels, pricing, installation, batteries, or financing.",
+  //   },
+  //   {
+  //     id: 5,
+  //     role: "user",
+  //     text: "Hello i want to know solar installation",
+  //   },
+  //   {
+  //     id: 6,
+  //     role: "assistant",
+  //     text: "Okay",
+  //   },
+  // ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,29 +52,29 @@ export default function ChatWindow({ onClose }) {
   }, []);
 
   useEffect(() => {
-  messagesEndRef.current?.scrollIntoView({
-    behavior: "smooth",
-  });
-}, [messages]);
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   async function startConversation() {
-  try {
-    const data = await startChat();
+    try {
+      const data = await startChat();
 
-    if (data.success) {
-      setConversationId(data.conversationId);
+      if (data.success) {
+        setConversationId(data.conversationId);
 
-      setMessages([
-        {
-          role: "assistant",
-          text: data.greeting,
-        },
-      ]);
+        setMessages([
+          {
+            role: "assistant",
+            text: data.greeting,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
     }
-  } catch (err) {
-    console.error(err);
   }
-}
 
   async function sendMessage() {
     if (!input.trim()) return;
@@ -124,7 +157,7 @@ export default function ChatWindow({ onClose }) {
         ))}
 
 
-        {loading && <ChatTyping/>}
+        {loading && <ChatTyping />}
         <div ref={messagesEndRef} />
       </div>
 

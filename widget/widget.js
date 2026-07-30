@@ -16,8 +16,8 @@ window.SolarAI = {
         document.body.appendChild(iframe);
         window.addEventListener("message", (event) => {
             if (event.data?.type === "OPEN_CHAT") {
-                iframe.style.width = "350px";
-                iframe.style.height = "450px";
+                iframe.style.width = "380px";
+                iframe.style.height = "480px";
             }
 
             if (event.data?.type === "CLOSE_CHAT") {
