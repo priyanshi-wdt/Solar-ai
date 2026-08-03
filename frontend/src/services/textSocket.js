@@ -10,7 +10,7 @@ export function connectTextSocket(onMessage) {
     }
 
     socket = new WebSocket(
-      `wss://solar-ai-ufc1.onrender.com?companyId==${companyId}&mode=text`
+      `wss://solar-ai-ufc1.onrender.com?companyId=${companyId}&mode=text`
       // `ws://localhost:5000?companyId=${companyId}&mode=text`
     );
 
