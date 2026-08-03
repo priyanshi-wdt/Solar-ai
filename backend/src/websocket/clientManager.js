@@ -25,7 +25,6 @@ class ClientManager {
     console.log(`❌ Client disconnected (${this.clients.size})`);
   }
 
-
   registerRepresentative(repId, socket) {
     socket.representativeId = repId;
 
@@ -36,6 +35,10 @@ class ClientManager {
 
   getRepresentative(repId) {
     return this.representatives.get(repId);
+  }
+
+  removeRepresentative(repId) {
+    this.representatives.delete(repId);
   }
 
   has(socket) {
@@ -54,21 +57,24 @@ class ClientManager {
     }
   }
 
-
   createConversation(conversationId, socket, companyId) {
   this.conversations.set(conversationId, {
     conversationId,
     companyId,
 
-    userSocket: socket,
+    // Customer socket
+    customerSocket: socket,
+
+    // Representative socket (null until someone joins)
     representativeSocket: null,
 
+    // AI | WAITING | REPRESENTATIVE
     status: "AI",
 
     awaitingRepresentativeConfirmation: false,
-  });
 
-  console.log("💬 Conversation Registered:", conversationId);
+    waitingSince: null,
+  });
 }
 
   getConversation(conversationId) {
@@ -94,13 +100,47 @@ class ClientManager {
   }
 
   setWaiting(conversationId) {
+    const conversation = this.conversations.get(conversationId);
+
+    if (!conversation) return;
+
+    conversation.status = "WAITING";
+
+    console.log("🟡 Waiting for Representative:", conversationId);
+  }
+
+  setRepresentative(conversationId, representativeSocket) {
   const conversation = this.conversations.get(conversationId);
 
   if (!conversation) return;
 
-  conversation.status = "WAITING";
+  conversation.representativeSocket = representativeSocket;
+  conversation.status = "REPRESENTATIVE";
 
-  console.log("🟡 Waiting for Representative:", conversationId);
+  console.log("🟢 Representative Connected:", conversationId);
+}
+
+acceptConversation(conversationId, representativeSocket) {
+  const conversation = this.conversations.get(conversationId);
+
+  if (!conversation) {
+    return false;
+  }
+
+  conversation.representativeSocket = representativeSocket;
+  conversation.status = "REPRESENTATIVE";
+
+  console.log("🟢 Representative accepted:", conversationId);
+
+  return conversation;
+}
+
+broadcastToRepresentatives(data) {
+    for (const socket of this.representatives.values()) {
+        if (socket.readyState === 1) {
+            socket.send(JSON.stringify(data));
+        }
+    }
 }
 }
 

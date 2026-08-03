@@ -11,6 +11,7 @@ const { handleAudioMessage } = require("./audioRouter");
 const textRouter = require("./textRouter");
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+const representativeRouter = require("./representativeRouter");
 
 function startWebSocketServer(server) {
   // connectDB()
@@ -90,7 +91,17 @@ function startWebSocketServer(server) {
 
         // ---------- TEXT ----------
         if (socket.mode === "text") {
-          const data = JSON.parse(message.toString());
+           const data = JSON.parse(message);
+
+        // Representative messages
+        if (
+            data.type === "REGISTER_REPRESENTATIVE" ||
+            data.type === "ACCEPT_CONVERSATION" ||
+            ws.representativeId
+        ) {
+            await representativeRouter(ws, data);
+            return;
+        }
 
           await textRouter(socket, data);
 

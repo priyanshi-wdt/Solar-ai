@@ -3,6 +3,14 @@ function isBusinessOpen(company) {
     return false;
   }
 
+  const now = new Date();
+
+  const indiaDate = new Date(
+    now.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    })
+  );
+
   const days = [
     "sunday",
     "monday",
@@ -13,9 +21,7 @@ function isBusinessOpen(company) {
     "saturday",
   ];
 
-  const now = new Date();
-
-  const today = days[now.getDay()];
+  const today = days[indiaDate.getDay()];
 
   const hours = company.businessHours[today];
 
@@ -24,7 +30,7 @@ function isBusinessOpen(company) {
   }
 
   const currentMinutes =
-    now.getHours() * 60 + now.getMinutes();
+    indiaDate.getHours() * 60 + indiaDate.getMinutes();
 
   const [openHour, openMinute] =
     hours.open.split(":").map(Number);
@@ -32,11 +38,8 @@ function isBusinessOpen(company) {
   const [closeHour, closeMinute] =
     hours.close.split(":").map(Number);
 
-  const openMinutes =
-    openHour * 60 + openMinute;
-
-  const closeMinutes =
-    closeHour * 60 + closeMinute;
+  const openMinutes = openHour * 60 + openMinute;
+  const closeMinutes = closeHour * 60 + closeMinute;
 
   return (
     currentMinutes >= openMinutes &&
