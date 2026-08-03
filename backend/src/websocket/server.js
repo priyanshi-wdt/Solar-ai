@@ -97,9 +97,9 @@ function startWebSocketServer(server) {
         if (
             data.type === "REGISTER_REPRESENTATIVE" ||
             data.type === "ACCEPT_CONVERSATION" ||
-            ws.representativeId
+            wss.representativeId
         ) {
-            await representativeRouter(ws, data);
+            await representativeRouter(wss, data);
             return;
         }
 
