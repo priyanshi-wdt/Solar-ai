@@ -8,6 +8,7 @@ const messageRouter = require("./messageRouter");
 const GeminiAdapter = require("./geminiAdapter");
 
 const { handleAudioMessage } = require("./audioRouter");
+const textRouter = require("./textRouter");
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
@@ -37,7 +38,6 @@ function startWebSocketServer(server) {
   //     console.error("❌ Failed to connect to MongoDB:", err);
   //   });
 
-
   connectDB().catch((err) => {
     console.error("❌ Failed to connect to MongoDB:", err);
   });
@@ -46,50 +46,67 @@ function startWebSocketServer(server) {
     server,
   });
 
-  wss.on("connection", (socket,request) => {
-    const url = new URL(
-        request.url,
-        CLIENT_URL
-    );
+  wss.on("connection", (socket, request) => {
+    const url = new URL(request.url, CLIENT_URL);
 
+    const companyId = url.searchParams.get("companyId");
 
-    const companyId =
-        url.searchParams.get(
-            "companyId"
-        );
-
+    const mode = url.searchParams.get("mode") || "voice";
 
     socket.companyId = companyId;
+    socket.mode = mode;
 
+    socket.chatMode = "AI";
+    socket.representative = null;
 
-    console.log(
-        "✅ Frontend connected"
-    );
+    console.log("✅ Frontend connected");
 
-
-    console.log(
-        "🏢 Company ID:",
-        companyId
-    );
+    console.log("🏢 Company ID:", companyId);
+    console.log("🏢 Mode:", mode);
 
     clientManager.add(socket);
 
+    // socket.on("message", async (message) => {
+    //   try {
+    //     // Binary frames are always raw mic audio (PCM16/16kHz/mono)
+    //     if (Buffer.isBuffer(message)) {
+    //       await handleAudioMessage(socket, message);
+    //       return;
+    //     }
+
+    //     // Everything else is JSON control messages
+    //     // (START_SESSION, TEXT, AUDIO_END, PING) -> messageRouter
+    //     // handles all of these, including AUDIO_END. Don't
+    //     // intercept AUDIO_END here — that was calling an
+    //     // undefined function and silently swallowing the event.
+    //     await messageRouter(socket, message.toString());
+    //   } catch (err) {
+    //     console.error("Message Router Error:", err);
+    //   }
+    // });
+
     socket.on("message", async (message) => {
       try {
-        // Binary frames are always raw mic audio (PCM16/16kHz/mono)
+
+        // ---------- TEXT ----------
+        if (socket.mode === "text") {
+          const data = JSON.parse(message.toString());
+
+          await textRouter(socket, data);
+
+          return;
+        }
+
+        // ---------- VOICE ----------
         if (Buffer.isBuffer(message)) {
           await handleAudioMessage(socket, message);
           return;
         }
 
-        // Everything else is JSON control messages
-        // (START_SESSION, TEXT, AUDIO_END, PING) -> messageRouter
-        // handles all of these, including AUDIO_END. Don't
-        // intercept AUDIO_END here — that was calling an
-        // undefined function and silently swallowing the event.
         await messageRouter(socket, message.toString());
+
       } catch (err) {
-        console.error("Message Router Error:", err);
+        console.error("Message Error:", err);
       }
     });
 

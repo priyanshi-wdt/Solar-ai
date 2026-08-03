@@ -1,12 +1,12 @@
-const express = require("express");
-const router = express.Router();
+// const express = require("express");
+// const router = express.Router();
 
-const chatController = require("../controllers/chatController");
+// const chatController = require("../controllers/chatController");
 
-// Start a new chat conversation
-router.post("/start", chatController.startConversation);
+// // Start a new chat conversation
+// router.post("/start", chatController.startConversation);
 
-// Send a message
-router.post("/", chatController.sendMessage);
+// // Send a message
+// router.post("/", chatController.sendMessage);
 
-module.exports = router;
+// module.exports = router;

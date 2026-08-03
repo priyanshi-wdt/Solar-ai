@@ -77,6 +77,7 @@ export default function useConversation() {
     console.error(err);
   }
 }
+
   function endConversation() {
     stopAudio();                  // Stop AI voice immediately
     stopWorklet();                // Stop microphone
