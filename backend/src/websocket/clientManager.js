@@ -136,9 +136,13 @@ acceptConversation(conversationId, representativeSocket) {
 }
 
 broadcastToRepresentatives(data) {
-    for (const socket of this.representatives.values()) {
-        if (socket.readyState === 1) {
-            socket.send(JSON.stringify(data));
+    console.log("📢 Broadcasting to representatives:", data);
+
+    for (const rep of this.representatives.values()) {
+        console.log("➡️ Sending to representative:", rep.representativeId);
+
+        if (rep.readyState === 1) {
+            rep.send(JSON.stringify(data));
         }
     }
 }

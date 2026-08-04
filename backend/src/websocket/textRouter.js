@@ -3,6 +3,7 @@ const conversationStore = require("../services/conversationStore");
 const clientManager = require("./clientManager");
 const isPositiveResponse = require("../utils/isPositiveResponse");
 const geminiChatService = require("../services/geminiChat.service");
+const { generateMockReply } = require("../services/mockChat.service");
 
 async function textRouter(socket, data) {
   switch (data.type) {
@@ -105,12 +106,14 @@ async function sendMessage(socket, text) {
       activeConversation.status = "WAITING";
       activeConversation.waitingSince = new Date();
 
+      
       clientManager.broadcastToRepresentatives({
         type: "NEW_WAITING_CONVERSATION",
         conversationId,
         companyId: activeConversation.companyId,
       });
-
+      
+      console.log("📨 Customer requested representative:", conversationId);
       await Conversation.updateOne(
         { sessionId: conversationId },
         {
@@ -155,14 +158,35 @@ async function sendMessage(socket, text) {
     source: "text",
   });
 
-  console.time("Gemini Response");
+  // console.time("Gemini Response");
 
-  const reply = await geminiChatService.sendMessage(
-    conversation.companyId,
-    text,
-    conversation,
-  );
-  console.timeEnd("Gemini Response");
+  // const reply = await geminiChatService.sendMessage(
+  //   conversation.companyId,
+  //   text,
+  //   conversation,
+  // );
+  // console.timeEnd("Gemini Response");
+
+
+  // let reply;
+
+  // if (process.env.USE_MOCK_AI === "true") {
+  //   console.time("Mock Response");
+
+  //   reply = await generateMockReply(text);
+
+  //   console.timeEnd("Mock Response");
+  // } else {
+    console.time("Gemini Response");
+    
+    const reply = await geminiChatService.sendMessage(
+      conversation.companyId,
+      text,
+      conversation,
+    );
+
+    console.timeEnd("Gemini Response");
+  // }
 
   if (reply.includes("[ASK_REPRESENTATIVE]")) {
     activeConversation.awaitingRepresentativeConfirmation = true;

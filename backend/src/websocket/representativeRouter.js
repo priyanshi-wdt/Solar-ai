@@ -13,12 +13,12 @@ async function representativeRouter(socket, data) {
       break;
 
     case "REPRESENTATIVE_MESSAGE":
-    await sendRepresentativeMessage(socket, data);
-    break;
+      await sendRepresentativeMessage(socket, data);
+      break;
 
     case "GET_WAITING_CONVERSATIONS":
-    getWaitingConversations(socket);
-    break;
+      getWaitingConversations(socket);
+      break;
 
     default:
       console.log("Unknown representative message:", data);
@@ -26,108 +26,97 @@ async function representativeRouter(socket, data) {
 }
 
 function registerRepresentative(socket, data) {
+  console.log("✅ Representative Registered:", data.repId);
   clientManager.registerRepresentative(data.repId, socket);
 
   socket.send(
     JSON.stringify({
       type: "REGISTERED",
-    })
+    }),
   );
 }
 
 async function acceptConversation(socket, data) {
   const { conversationId } = data;
 
-  const conversation =
-    clientManager.acceptConversation(
-      conversationId,
-      socket
-    );
+  const conversation = clientManager.acceptConversation(conversationId, socket);
 
   if (!conversation) {
     socket.send(
       JSON.stringify({
         type: "ERROR",
         text: "Conversation not found.",
-      })
+      }),
     );
     return;
   }
-
-  await conversationStore.append({
-    conversationId,
-    role: "assistant",
-    text,
-    source: "representative",
-});
 
   // Notify customer
   conversation.customerSocket.send(
     JSON.stringify({
       type: "REPRESENTATIVE_CONNECTED",
       text: "You are now connected with a representative.",
-    })
+    }),
   );
 
   socket.send(
     JSON.stringify({
       type: "CONNECTED",
       conversationId,
-    })
+    }),
   );
 
-  console.log(
-    "🟢 Representative connected:",
-    conversationId
-  );
+  console.log("🟢 Representative connected:", conversationId);
 }
 
-
 async function sendRepresentativeMessage(socket, data) {
-    const { conversationId, text } = data;
+  const { conversationId, text } = data;
 
-    const conversation =
-        clientManager.getConversation(conversationId);
+  const conversation = clientManager.getConversation(conversationId);
 
-    if (!conversation) return;
+  if (!conversation) return;
 
-    // Save message in MongoDB
-    await Conversation.updateOne(
-        { sessionId: conversationId },
-        {
-            $push: {
-                messages: {
-                    role: "assistant",
-                    text,
-                    source: "representative",
-                    timestamp: new Date(),
-                },
-            },
-        }
-    );
+  // Save message in MongoDB
+  await Conversation.updateOne(
+    { sessionId: conversationId },
+    {
+      $push: {
+        messages: {
+          role: "assistant",
+          text,
+          source: "representative",
+          timestamp: new Date(),
+        },
+      },
+    },
+  );
 
-    // Send message to customer
-    conversation.customerSocket.send(
-        JSON.stringify({
-            type: "TEXT",
-            text,
-        })
-    );
+  // Send message to customer
+  conversation.customerSocket.send(
+    JSON.stringify({
+      type: "TEXT",
+      text,
+    }),
+  );
 }
 
 function getWaitingConversations(socket) {
-    const conversations = clientManager.getWaitingConversations();
+  const conversations = clientManager.getWaitingConversations();
 
-    socket.send(
-        JSON.stringify({
-            type: "WAITING_CONVERSATIONS",
-            conversations: conversations.map(c => ({
-                conversationId: c.conversationId,
-                companyId: c.companyId,
-                waitingSince: c.waitingSince,
-            })),
-        })
-    );
+  socket.send(
+    JSON.stringify({
+      type: "WAITING_CONVERSATIONS",
+      conversations: conversations.map((c) => ({
+        conversationId: c.conversationId,
+        companyId: c.companyId,
+        waitingSince: c.waitingSince,
+      })),
+    }),
+  );
+  console.log(
+    "Waiting conversations:",
+    clientManager.getWaitingConversations(),
+  );
 }
 
 module.exports = representativeRouter;

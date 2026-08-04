@@ -91,17 +91,19 @@ function startWebSocketServer(server) {
 
         // ---------- TEXT ----------
         if (socket.mode === "text") {
-           const data = JSON.parse(message);
+          const data = JSON.parse(message);
 
-        // Representative messages
-        if (
+          // Representative messages
+          if (
             data.type === "REGISTER_REPRESENTATIVE" ||
+            data.type === "GET_WAITING_CONVERSATIONS" ||
             data.type === "ACCEPT_CONVERSATION" ||
-            wss.representativeId
-        ) {
-            await representativeRouter(wss, data);
+            data.type === "REPRESENTATIVE_MESSAGE" ||
+            socket.representativeId
+          ) {
+            await representativeRouter(socket, data);
             return;
-        }
+          }
 
           await textRouter(socket, data);
 

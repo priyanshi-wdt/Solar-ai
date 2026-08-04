@@ -5,6 +5,9 @@ const isBusinessOpen = require("../utils/isBusinessOpen");
 
 const MODEL = "gemini-3.5-flash";
 
+// Latest Flash alias
+// const MODEL = "gemini-3.5-flash-lite";
+
 class GeminiChatService {
   constructor() {
     this.ai = new GoogleGenAI({
