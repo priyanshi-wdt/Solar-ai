@@ -201,15 +201,11 @@ async function sendMessage(socket, text) {
   if (reply.includes("[CONNECT_REPRESENTATIVE]")) {
     activeConversation.awaitingRepresentativeConfirmation = false;
     activeConversation.status = "WAITING";
-<<<<<<< HEAD
-    activeConversation.waitingSince = new Date();
 
-=======
+    activeConversation.waitingSince = new Date();
     clearInactivityTimers(socket);
-    activeConversation.waitingSince = new Date();
+    activeConversation.waitingSince = new Date();z
 
-
->>>>>>> 8c67dd5 (test websocket issue)
     clientManager.broadcastToRepresentatives({
       type: "NEW_WAITING_CONVERSATION",
       conversationId,
@@ -254,10 +250,8 @@ async function sendMessage(socket, text) {
 }
 
 async function endChat(socket) {
-<<<<<<< HEAD
-=======
+
   clearInactivityTimers(socket);
->>>>>>> 8c67dd5 (test websocket issue)
   const conversationId = conversationStore.getSessionId(socket);
 
   const conversation = clientManager.getConversation(conversationId);
