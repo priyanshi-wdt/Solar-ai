@@ -151,10 +151,8 @@ function startWebSocketServer(server) {
       }
 
       GeminiAdapter.close(socket);
-<<<<<<< HEAD
-=======
+
       clearInactivityTimers(socket);
->>>>>>> 8c67dd5 (test websocket issue)
       clientManager.remove(socket);
     });
 
