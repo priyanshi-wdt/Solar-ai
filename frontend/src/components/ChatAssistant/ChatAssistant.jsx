@@ -6,28 +6,28 @@ export default function ChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
 
   function handleClick() {
-  if (isOpen) {
-    // Tell the parent page to shrink the iframe
-    window.parent.postMessage(
-      {
-        type: "CLOSE_CHAT",
-      },
-      "*"
-    );
+    if (isOpen) {
+      // Tell the parent page to shrink the iframe
+      window.parent.postMessage(
+        {
+          type: "CLOSE_CHAT",
+        },
+        "*"
+      );
 
-    setIsOpen(false);
-  } else {
-    // Tell the parent page to expand the iframe
-    window.parent.postMessage(
-      {
-        type: "OPEN_CHAT",
-      },
-      "*"
-    );
+      setIsOpen(false);
+    } else {
+      // Tell the parent page to expand the iframe
+      window.parent.postMessage(
+        {
+          type: "OPEN_CHAT",
+        },
+        "*"
+      );
 
-    setIsOpen(true);
+      setIsOpen(true);
+    }
   }
-}
 
   return (
     <>
@@ -41,15 +41,15 @@ export default function ChatAssistant() {
       {isOpen && (
         <ChatWindow
           onClose={() => {
-      window.parent.postMessage(
-        {
-          type: "CLOSE_CHAT",
-        },
-        "*"
-      );
+            window.parent.postMessage(
+              {
+                type: "CLOSE_CHAT",
+              },
+              "*"
+            );
 
-      setIsOpen(false);
-    }}
+            setIsOpen(false);
+          }}
         />
       )}
     </>

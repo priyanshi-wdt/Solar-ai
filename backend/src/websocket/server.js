@@ -88,7 +88,6 @@ function startWebSocketServer(server) {
 
     socket.on("message", async (message) => {
       try {
-
         // ---------- TEXT ----------
         if (socket.mode === "text") {
           const data = JSON.parse(message);
@@ -117,17 +116,38 @@ function startWebSocketServer(server) {
         }
 
         await messageRouter(socket, message.toString());
-
       } catch (err) {
         console.error("Message Error:", err);
       }
     });
 
-    socket.on("close", () => {
+    socket.on("close", async () => {
       console.log("❌ Frontend disconnected");
 
-      GeminiAdapter.close(socket);
+      const conversationId = socket.conversationId;
 
+      if (conversationId) {
+        const conversation = clientManager.getConversation(conversationId);
+
+        if (
+          conversation &&
+          conversation.representativeSocket &&
+          conversation.representativeSocket.readyState === 1
+        ) {
+          conversation.representativeSocket.send(
+            JSON.stringify({
+              type: "CUSTOMER_DISCONNECTED",
+              conversationId,
+              text: "The customer disconnected.",
+            }),
+          );
+        }
+
+        await conversationStore.end(socket);
+        clientManager.removeConversation(conversationId);
+      }
+
+      GeminiAdapter.close(socket);
       clientManager.remove(socket);
     });
 

@@ -176,7 +176,7 @@ async function sendMessage(socket, text) {
   // } else {
     console.time("Gemini Response");
 
-   const  reply = await geminiChatService.sendMessage(
+   const reply = await geminiChatService.sendMessage(
       conversation.companyId,
       text,
       conversation,
