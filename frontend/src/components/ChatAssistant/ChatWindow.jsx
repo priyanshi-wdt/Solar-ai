@@ -203,6 +203,7 @@ import {
   disconnectTextSocket,
   sendTextMessage,
   startChat,
+  endChat,
 } from "../../services/textSocket";
 
 export default function ChatWindow({ onClose }) {
@@ -229,6 +230,26 @@ export default function ChatWindow({ onClose }) {
                 },
               ]);
 
+              break;
+
+            case "WAITING_FOR_REPRESENTATIVE":
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "system",
+                  text: message.text,
+                },
+              ]);
+              break;
+
+            case "REPRESENTATIVE_CONNECTED":
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "system",
+                  text: message.text,
+                },
+              ]);
               break;
 
             default:
@@ -292,15 +313,35 @@ export default function ChatWindow({ onClose }) {
       <div className="chat-header">
         <span>Kristin</span>
 
-        <button onClick={onClose}>✕</button>
+        <button
+          onClick={() => {
+            endChat();
+
+            setTimeout(() => {
+              onClose();
+            }, 100);
+          }}
+        >
+          ✕
+        </button>
       </div>
 
       <div className="chat-body">
-        {messages.map((msg, index) => (
-          <div key={index} className={`chat-message ${msg.role}`}>
-            {msg.text}
-          </div>
-        ))}
+        {messages.map((msg, index) => {
+          if (msg.role === "system") {
+            return (
+              <div key={index} className="system-container">
+                <div className="system-message">{msg.text}</div>
+              </div>
+            );
+          }
+
+          return (
+            <div key={index} className={`chat-message ${msg.role}`}>
+              {msg.text}
+            </div>
+          );
+        })}
 
         {loading && <ChatTyping />}
 

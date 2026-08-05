@@ -1,9 +1,7 @@
 const Conversation = require("../models/Conversation");
 const conversationStore = require("../services/conversationStore");
 const clientManager = require("./clientManager");
-const isPositiveResponse = require("../utils/isPositiveResponse");
 const geminiChatService = require("../services/geminiChat.service");
-const { generateMockReply } = require("../services/mockChat.service");
 
 async function textRouter(socket, data) {
   switch (data.type) {
@@ -16,7 +14,8 @@ async function textRouter(socket, data) {
       break;
 
     case "END_CHAT":
-      await conversationStore.end(socket);
+      console.log("🔴 END_CHAT received");
+      await endChat(socket);
       break;
 
     default:
@@ -99,43 +98,42 @@ async function sendMessage(socket, text) {
   }
 
   // Check if AI is waiting for representative confirmation
-  if (activeConversation.awaitingRepresentativeConfirmation) {
-    if (isPositiveResponse(text)) {
-      activeConversation.awaitingRepresentativeConfirmation = false;
+  // if (activeConversation.awaitingRepresentativeConfirmation) {
+  //   if (isPositiveResponse(text)) {
+  //     activeConversation.awaitingRepresentativeConfirmation = false;
 
-      activeConversation.status = "WAITING";
-      activeConversation.waitingSince = new Date();
+  //     activeConversation.status = "WAITING";
+  //     activeConversation.waitingSince = new Date();
 
-      
-      clientManager.broadcastToRepresentatives({
-        type: "NEW_WAITING_CONVERSATION",
-        conversationId,
-        companyId: activeConversation.companyId,
-      });
-      
-      console.log("📨 Customer requested representative:", conversationId);
-      await Conversation.updateOne(
-        { sessionId: conversationId },
-        {
-          status: "waiting",
-        },
-      );
+  //     clientManager.broadcastToRepresentatives({
+  //       type: "NEW_WAITING_CONVERSATION",
+  //       conversationId,
+  //       companyId: activeConversation.companyId,
+  //     });
 
-      socket.send(
-        JSON.stringify({
-          type: "WAITING_FOR_REPRESENTATIVE",
-          text: "Please wait while we connect you with a representative.",
-        }),
-      );
+  //     console.log("📨 Customer requested representative:", conversationId);
+  //     await Conversation.updateOne(
+  //       { sessionId: conversationId },
+  //       {
+  //         status: "waiting",
+  //       },
+  //     );
 
-      console.log("🟡 Waiting for representative:", conversationId);
+  //     socket.send(
+  //       JSON.stringify({
+  //         type: "WAITING_FOR_REPRESENTATIVE",
+  //         text: "Please wait while we connect you with a representative.",
+  //       }),
+  //     );
 
-      return;
-    }
+  //     console.log("🟡 Waiting for representative:", conversationId);
 
-    // User said no
-    activeConversation.awaitingRepresentativeConfirmation = false;
-  }
+  //     return;
+  //   }
+
+  //   // User said no
+  //   activeConversation.awaitingRepresentativeConfirmation = false;
+  // }
 
   const conversation = await Conversation.findOne({
     sessionId: conversationId,
@@ -167,19 +165,18 @@ async function sendMessage(socket, text) {
   // );
   // console.timeEnd("Gemini Response");
 
-
   // let reply;
 
   // if (process.env.USE_MOCK_AI === "true") {
   //   console.time("Mock Response");
 
-  //   reply = await generateMockReply(text);
+  //   reply = await generateMockReply(conversationId, text);
 
   //   console.timeEnd("Mock Response");
   // } else {
     console.time("Gemini Response");
-    
-    const reply = await geminiChatService.sendMessage(
+
+   const  reply = await geminiChatService.sendMessage(
       conversation.companyId,
       text,
       conversation,
@@ -192,12 +189,43 @@ async function sendMessage(socket, text) {
     activeConversation.awaitingRepresentativeConfirmation = true;
   }
 
-  const cleanReply = reply.replace("[ASK_REPRESENTATIVE]", "").trim();
+  if (reply.includes("[CONNECT_REPRESENTATIVE]")) {
+    activeConversation.awaitingRepresentativeConfirmation = false;
+    activeConversation.status = "WAITING";
+    activeConversation.waitingSince = new Date();
+
+    clientManager.broadcastToRepresentatives({
+      type: "NEW_WAITING_CONVERSATION",
+      conversationId,
+      companyId: activeConversation.companyId,
+    });
+
+    await Conversation.updateOne(
+      { sessionId: conversationId },
+      { status: "waiting" },
+    );
+
+    console.log("📨 Customer requested representative:", conversationId);
+
+    socket.send(
+      JSON.stringify({
+        type: "WAITING_FOR_REPRESENTATIVE",
+        text: "Please wait while we connect you with a representative.",
+      }),
+    );
+
+    return;
+  }
+
+  const cleanReply = reply
+    .replace("[ASK_REPRESENTATIVE]", "")
+    .replace("[CONNECT_REPRESENTATIVE]", "")
+    .trim();
 
   await conversationStore.append({
     socket,
     role: "assistant",
-    text: reply,
+    text: cleanReply,
     source: "text",
   });
 
@@ -207,6 +235,32 @@ async function sendMessage(socket, text) {
       text: cleanReply,
     }),
   );
+}
+
+async function endChat(socket) {
+  const conversationId = conversationStore.getSessionId(socket);
+
+  const conversation = clientManager.getConversation(conversationId);
+
+  if (!conversation) return;
+
+  // Notify representative if connected
+  if (
+    conversation.representativeSocket &&
+    conversation.representativeSocket.readyState === 1
+  ) {
+    conversation.representativeSocket.send(
+      JSON.stringify({
+        type: "CUSTOMER_DISCONNECTED",
+        conversationId,
+        text: "The customer has ended the conversation.",
+      }),
+    );
+  }
+
+  await conversationStore.end(socket);
+
+  clientManager.removeConversation(conversationId);
 }
 
 module.exports = textRouter;

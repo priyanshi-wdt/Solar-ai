@@ -68,3 +68,13 @@ export function startChat() {
     })
   );
 }
+
+export function endChat() {
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(
+    JSON.stringify({
+      type: "END_CHAT",
+    })
+  );
+}

@@ -39,6 +39,10 @@ function registerRepresentative(socket, data) {
 async function acceptConversation(socket, data) {
   const { conversationId } = data;
 
+  const dbConversation = await Conversation.findOne({
+  sessionId: conversationId,
+});
+
   const conversation = clientManager.acceptConversation(conversationId, socket);
 
   if (!conversation) {
@@ -65,6 +69,13 @@ async function acceptConversation(socket, data) {
       conversationId,
     }),
   );
+
+  socket.send(
+  JSON.stringify({
+    type: "CONVERSATION_HISTORY",
+    messages: dbConversation.messages,
+  })
+);
 
   console.log("🟢 Representative connected:", conversationId);
 }
