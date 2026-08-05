@@ -60,7 +60,12 @@ export function isConnected() {
 
 
 export function startChat() {
-  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.log("Socket not ready");
+    return;
+  }
+
+  console.log("➡️ Sending START_CHAT");
 
   socket.send(
     JSON.stringify({

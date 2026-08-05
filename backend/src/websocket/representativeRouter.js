@@ -1,6 +1,7 @@
 const clientManager = require("./clientManager");
 const Conversation = require("../models/Conversation");
 const conversationStore = require("../services/conversationStore");
+const { clearInactivityTimers } = require("../utils/inactivityManager");
 
 async function representativeRouter(socket, data) {
   switch (data.type) {
@@ -39,11 +40,11 @@ function registerRepresentative(socket, data) {
 async function acceptConversation(socket, data) {
   const { conversationId } = data;
 
-  const dbConversation = await Conversation.findOne({
-  sessionId: conversationId,
-});
-
-  const conversation = clientManager.acceptConversation(conversationId, socket);
+  const conversation =
+    clientManager.acceptConversation(
+      conversationId,
+      socket
+    );
 
   if (!conversation) {
     socket.send(

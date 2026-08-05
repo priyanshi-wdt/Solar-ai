@@ -265,7 +265,10 @@ export default function ChatWindow({ onClose }) {
         console.error(err);
         setLoading(false);
       }
+      console.log('mess',messages);
     }
+
+    
 
     connect();
 
@@ -307,6 +310,9 @@ export default function ChatWindow({ onClose }) {
       sendMessage();
     }
   }
+
+  console.log('mee',messages);
+  
 
   return (
     <div className="chat-window">

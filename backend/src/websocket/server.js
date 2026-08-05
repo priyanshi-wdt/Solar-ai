@@ -12,6 +12,8 @@ const textRouter = require("./textRouter");
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 const representativeRouter = require("./representativeRouter");
+const { clearInactivityTimers } = require("../utils/inactivityManager");
+const conversationStore = require("../services/conversationStore");
 
 function startWebSocketServer(server) {
   // connectDB()
@@ -48,6 +50,7 @@ function startWebSocketServer(server) {
   });
 
   wss.on("connection", (socket, request) => {
+     console.log("====== NEW CONNECTION ======");
     const url = new URL(request.url, CLIENT_URL);
 
     const companyId = url.searchParams.get("companyId");
@@ -148,6 +151,10 @@ function startWebSocketServer(server) {
       }
 
       GeminiAdapter.close(socket);
+<<<<<<< HEAD
+=======
+      clearInactivityTimers(socket);
+>>>>>>> 8c67dd5 (test websocket issue)
       clientManager.remove(socket);
     });
 

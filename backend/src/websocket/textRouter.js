@@ -2,6 +2,10 @@ const Conversation = require("../models/Conversation");
 const conversationStore = require("../services/conversationStore");
 const clientManager = require("./clientManager");
 const geminiChatService = require("../services/geminiChat.service");
+const {
+  startInactivityTimers,
+  clearInactivityTimers,
+} = require("../utils/inactivityManager");
 
 async function textRouter(socket, data) {
   switch (data.type) {
@@ -54,11 +58,16 @@ async function startChat(socket) {
       text: greeting,
     }),
   );
+  startInactivityTimers(socket, endChat);
 }
 
 async function sendMessage(socket, text) {
   const conversationId = conversationStore.getSessionId(socket);
   const activeConversation = clientManager.getConversation(conversationId);
+
+  if (activeConversation.status === "AI") {
+  startInactivityTimers(socket, endChat);
+}
 
   // Customer is already connected to a representative
   if (activeConversation.status === "REPRESENTATIVE") {
@@ -192,8 +201,15 @@ async function sendMessage(socket, text) {
   if (reply.includes("[CONNECT_REPRESENTATIVE]")) {
     activeConversation.awaitingRepresentativeConfirmation = false;
     activeConversation.status = "WAITING";
+<<<<<<< HEAD
     activeConversation.waitingSince = new Date();
 
+=======
+    clearInactivityTimers(socket);
+    activeConversation.waitingSince = new Date();
+
+
+>>>>>>> 8c67dd5 (test websocket issue)
     clientManager.broadcastToRepresentatives({
       type: "NEW_WAITING_CONVERSATION",
       conversationId,
@@ -238,6 +254,10 @@ async function sendMessage(socket, text) {
 }
 
 async function endChat(socket) {
+<<<<<<< HEAD
+=======
+  clearInactivityTimers(socket);
+>>>>>>> 8c67dd5 (test websocket issue)
   const conversationId = conversationStore.getSessionId(socket);
 
   const conversation = clientManager.getConversation(conversationId);
