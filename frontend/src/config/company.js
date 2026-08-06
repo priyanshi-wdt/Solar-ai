@@ -1,13 +1,7 @@
-const params = new URLSearchParams(
-    window.location.search
-);
+const params = new URLSearchParams(window.location.search);
 
+export const companyId = params.get("companyId");
+export const icon = params.get("imageSrc");
 
-export const companyId =
-    params.get("companyId");
-
-
-console.log(
-    "Company:",
-    companyId
-);
+console.log("Company:", companyId);
+console.log("Icon:", icon);

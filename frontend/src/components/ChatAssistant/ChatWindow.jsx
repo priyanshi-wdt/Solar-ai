@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./ChatAssistant.css";
 import ChatTyping from "./ChatTyping";
+import { icon } from "../../config/company";
 
 import {
   connectTextSocket,
@@ -139,9 +140,24 @@ export default function ChatWindow({ onClose }) {
 
   return (
     <div className="chat-window">
-      <div className="chat-header">
-        <span>Support</span>
+      {/* <div className="chat-header">
+         <img
+      src={icon}
+      alt="Support"
+      className="chat-header-icon"
+    />
+        <span>Support</span> */}
 
+      <div className="chat-header">
+        <div className="chat-header-left">
+          <img
+            src={icon}
+            alt="Support"
+            className="chat-header-icon"
+          />
+
+          <span>Support</span>
+        </div>
         <button
           onClick={() => {
             endChat();
