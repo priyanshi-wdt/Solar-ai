@@ -28,16 +28,18 @@ async function textRouter(socket, data) {
 }
 
 async function startChat(socket) {
-  const conversationId = await conversationStore.start({
-    socket,
-    companyId: socket.companyId,
-    conversationType: "chat",
-  });
+  // const conversationId = await conversationStore.start({
+  //   socket,
+  //   companyId: socket.companyId,
+  //   conversationType: "chat",
+  // });
 
-  socket.conversationId = conversationId;
+  // socket.conversationId = conversationId;
 
-  clientManager.createConversation(conversationId, socket, socket.companyId);
+  // clientManager.createConversation(conversationId, socket, socket.companyId);
   //   const greeting = await geminiChatService.startConversation(socket.companyId);
+
+  const conversationId = await createNewConversation(socket);
 
   console.time("Greeting");
 
@@ -61,13 +63,42 @@ async function startChat(socket) {
   startInactivityTimers(socket, endChat);
 }
 
+async function createNewConversation(socket) {
+  const conversationId = await conversationStore.start({
+    socket,
+    companyId: socket.companyId,
+    conversationType: "chat",
+  });
+
+  // ADD THIS
+  socket.conversationId = conversationId;
+
+  clientManager.createConversation(
+    conversationId,
+    socket,
+    socket.companyId
+  );
+
+  console.log("🆕 New chat started:", conversationId);
+
+  return conversationId;
+}
+
 async function sendMessage(socket, text) {
-  const conversationId = conversationStore.getSessionId(socket);
+  let conversationId = conversationStore.getSessionId(socket);
+
+  if (!conversationId) {
+    conversationId = await createNewConversation(socket);
+
+    // Restart inactivity timer for the new conversation
+    startInactivityTimers(socket, endChat);
+  }
+
   const activeConversation = clientManager.getConversation(conversationId);
 
   if (activeConversation.status === "AI") {
-  startInactivityTimers(socket, endChat);
-}
+    startInactivityTimers(socket, endChat);
+  }
 
   // Customer is already connected to a representative
   if (activeConversation.status === "REPRESENTATIVE") {
@@ -183,15 +214,15 @@ async function sendMessage(socket, text) {
 
   //   console.timeEnd("Mock Response");
   // } else {
-    console.time("Gemini Response");
+  console.time("Gemini Response");
 
-   const reply = await geminiChatService.sendMessage(
-      conversation.companyId,
-      text,
-      conversation,
-    );
+  const reply = await geminiChatService.sendMessage(
+    conversation.companyId,
+    text,
+    conversation,
+  );
 
-    console.timeEnd("Gemini Response");
+  console.timeEnd("Gemini Response");
   // }
 
   if (reply.includes("[ASK_REPRESENTATIVE]")) {
@@ -204,7 +235,7 @@ async function sendMessage(socket, text) {
 
     activeConversation.waitingSince = new Date();
     clearInactivityTimers(socket);
-    activeConversation.waitingSince = new Date();z
+    activeConversation.waitingSince = new Date();
 
     clientManager.broadcastToRepresentatives({
       type: "NEW_WAITING_CONVERSATION",
@@ -250,15 +281,14 @@ async function sendMessage(socket, text) {
 }
 
 async function endChat(socket) {
-
   clearInactivityTimers(socket);
+
   const conversationId = conversationStore.getSessionId(socket);
 
   const conversation = clientManager.getConversation(conversationId);
 
   if (!conversation) return;
 
-  // Notify representative if connected
   if (
     conversation.representativeSocket &&
     conversation.representativeSocket.readyState === 1

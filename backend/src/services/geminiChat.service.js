@@ -26,7 +26,8 @@ class GeminiChatService {
 
     const prompt = buildPrompt(
       company,
-      representativeAvailable
+      representativeAvailable,
+      "chat"
     );
 
     const contents = conversation.messages.map((msg) => ({
@@ -136,7 +137,7 @@ class GeminiChatService {
       throw new Error(`Company not found: ${companyId}`);
     }
 
-    return `Hello! My name is ${company.receptionistName}. How can I help you today?`;
+    return `Hi! I'm ${company.receptionistName}, ${company.companyName} AI assistant. How can I help you today?`;
   }
 }
 

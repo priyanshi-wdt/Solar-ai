@@ -39,7 +39,7 @@ class GeminiAdapter {
       throw new Error(`Company not found: ${companyId}`);
     }
 
-    const prompt = buildPrompt(company);
+    const prompt = buildPrompt(company, false, "voice");
     // Start the DB conversation record before Gemini connects so
     // there's no race between the greeting message and logging it.
     await conversationStore.start({

@@ -56,9 +56,6 @@ function startInactivityTimers(socket, endChat) {
     );
 
     await endChat(socket);
-
-    socket.close();
-
   }, 6 * 60 * 1000);
 }
 
