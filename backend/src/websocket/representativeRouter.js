@@ -40,11 +40,10 @@ function registerRepresentative(socket, data) {
 async function acceptConversation(socket, data) {
   const { conversationId } = data;
 
-  const conversation =
-    clientManager.acceptConversation(
-      conversationId,
-      socket
-    );
+  const conversation = clientManager.acceptConversation(
+    conversationId,
+    socket
+  );
 
   if (!conversation) {
     socket.send(
@@ -56,6 +55,11 @@ async function acceptConversation(socket, data) {
     return;
   }
 
+  // Load conversation from MongoDB
+  const dbConversation = await Conversation.findOne({
+    sessionId: conversationId,
+  });
+
   // Notify customer
   conversation.customerSocket.send(
     JSON.stringify({
@@ -64,6 +68,7 @@ async function acceptConversation(socket, data) {
     }),
   );
 
+  // Notify representative
   socket.send(
     JSON.stringify({
       type: "CONNECTED",
@@ -71,12 +76,13 @@ async function acceptConversation(socket, data) {
     }),
   );
 
+  // Send history
   socket.send(
-  JSON.stringify({
-    type: "CONVERSATION_HISTORY",
-    messages: dbConversation.messages,
-  })
-);
+    JSON.stringify({
+      type: "CONVERSATION_HISTORY",
+      messages: dbConversation?.messages || [],
+    }),
+  );
 
   console.log("🟢 Representative connected:", conversationId);
 }
