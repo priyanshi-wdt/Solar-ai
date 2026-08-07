@@ -13,35 +13,35 @@ import {
 } from "../../services/textSocket";
 
 export default function ChatWindow({ onClose }) {
-  // const [messages, setMessages] = useState([]);
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      text: "Hi! I'm Kristin, Solar AI assistant. How can I help you today?",
-    },
-    {
-      role: "user",
-      text: "Can you tell me the process of solar installation?",
-    },
-    {
-      role: "assistant",
-      text: `The solar installation process typically involves a few key steps to ensure everything is customized and safely set up for your property:
+  const [messages, setMessages] = useState([]);
+//   const [messages, setMessages] = useState([
+//     {
+//       role: "assistant",
+//       text: "Hi! I'm Kristin, Solar AI assistant. How can I help you today?",
+//     },
+//     {
+//       role: "user",
+//       text: "Can you tell me the process of solar installation?",
+//     },
+//     {
+//       role: "assistant",
+//       text: `The solar installation process typically involves a few key steps to ensure everything is customized and safely set up for your property:
 
-1. **Consultation & Custom Design**: We look at your energy history and property layout to design a system tailored to your specific goals.
+// 1. **Consultation & Custom Design**: We look at your energy history and property layout to design a system tailored to your specific goals.
 
-2. **Permitting & Approvals**: We handle all the paperwork, including local building permits and utility connection approvals, so you don't have to worry about the logistics.
+// 2. **Permitting & Approvals**: We handle all the paperwork, including local building permits and utility connection approvals, so you don't have to worry about the logistics.
 
-3. **Installation**: Our experienced crew mounts the solar panels, installs the inverters, and connects everything. The actual hands-on installation usually takes just 1 to 2 days.
+// 3. **Installation**: Our experienced crew mounts the solar panels, installs the inverters, and connects everything. The actual hands-on installation usually takes just 1 to 2 days.
 
-4. **Inspection & Activation**: Once local inspectors approve the installation, your utility company will grant permission to turn the system on and start generating power.
+// 4. **Inspection & Activation**: Once local inspectors approve the installation, your utility company will grant permission to turn the system on and start generating power.
 
-Are you looking into solar for your home or for a business?`,
-    },
-    {
-      role: "assistant",
-      text: "Are you still there?",
-    },
-  ]);
+// Are you looking into solar for your home or for a business?`,
+//     },
+//     {
+//       role: "assistant",
+//       text: "Are you still there?",
+//     },
+//   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
