@@ -6,20 +6,20 @@ import { MessageCircleMore } from "lucide-react";
 
 export default function ChatAssistant({ company }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showGreeting, setShowGreeting] = useState(true);
-  const [showBadge, setShowBadge] = useState(true);
+  const [showGreeting, setShowGreeting] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
 
-  //   useEffect(() => {
-  //   const showTimer = setTimeout(() => {
-  //     setShowGreeting(true);
-  //     setShowBadge(true);
-  //   }, 2000);
+    useEffect(() => {
+    const showTimer = setTimeout(() => {
+      setShowGreeting(true);
+      setShowBadge(true);
+    }, 1000);
 
-  //   return () => {
-  //     clearTimeout(showTimer);
-  //     clearTimeout(hideTimer);
-  //   };
-  // }, []);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
 
   // function handleClick() {
   //   if (isOpen) {

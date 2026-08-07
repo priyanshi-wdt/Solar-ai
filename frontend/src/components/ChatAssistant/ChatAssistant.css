@@ -1,3 +1,12 @@
+.chat-window *,
+.chat-window *::before,
+.chat-window *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
 .chat-button {
   position: relative;
   width: 80px;
@@ -367,4 +376,18 @@
   height: 34px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+
+.chat-message.assistant ol {
+  padding-left: 22px;
+  margin: 10px 0;
+}
+
+.chat-message.assistant li {
+  margin-bottom: 8px;
+}
+
+.chat-message.assistant p {
+  /* margin: 6px 0; */
 }

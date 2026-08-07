@@ -8,7 +8,7 @@ function clearInactivityTimers(socket) {
 function startInactivityTimers(socket, endChat) {
   clearInactivityTimers(socket);
 
-  // 2 Minutes
+  // 2.5 Minutes
   socket.reminder1 = setTimeout(() => {
     if (socket.readyState !== 1) return;
 
@@ -18,7 +18,7 @@ function startInactivityTimers(socket, endChat) {
         text: "Are you still there?",
       })
     );
-  }, 2 * 60 * 1000);
+  }, 2.5 * 60 * 1000);
 
   // 3.5 Minutes
   socket.reminder2 = setTimeout(() => {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./ChatAssistant.css";
 import ChatTyping from "./ChatTyping";
 import { icon } from "../../config/company";
+import ReactMarkdown from "react-markdown";
 
 import {
   connectTextSocket,
@@ -12,7 +13,35 @@ import {
 } from "../../services/textSocket";
 
 export default function ChatWindow({ onClose }) {
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      text: "Hi! I'm Kristin, Solar AI assistant. How can I help you today?",
+    },
+    {
+      role: "user",
+      text: "Can you tell me the process of solar installation?",
+    },
+    {
+      role: "assistant",
+      text: `The solar installation process typically involves a few key steps to ensure everything is customized and safely set up for your property:
+
+1. **Consultation & Custom Design**: We look at your energy history and property layout to design a system tailored to your specific goals.
+
+2. **Permitting & Approvals**: We handle all the paperwork, including local building permits and utility connection approvals, so you don't have to worry about the logistics.
+
+3. **Installation**: Our experienced crew mounts the solar panels, installs the inverters, and connects everything. The actual hands-on installation usually takes just 1 to 2 days.
+
+4. **Inspection & Activation**: Once local inspectors approve the installation, your utility company will grant permission to turn the system on and start generating power.
+
+Are you looking into solar for your home or for a business?`,
+    },
+    {
+      role: "assistant",
+      text: "Are you still there?",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,60 +50,60 @@ export default function ChatWindow({ onClose }) {
 
   // Connect WebSocket
   useEffect(() => {
-    async function connect() {
-      try {
-        await connectTextSocket((message) => {
-          switch (message.type) {
-            case "TEXT":
-              setLoading(false);
+    // async function connect() {
+    //   try {
+    //     await connectTextSocket((message) => {
+    //       switch (message.type) {
+    //         case "TEXT":
+    //           setLoading(false);
 
-              setMessages((prev) => [
-                ...prev,
-                {
-                  role: "assistant",
-                  text: message.text,
-                },
-              ]);
+    //           setMessages((prev) => [
+    //             ...prev,
+    //             {
+    //               role: "assistant",
+    //               text: message.text,
+    //             },
+    //           ]);
 
-              break;
+    //           break;
 
-            case "WAITING_FOR_REPRESENTATIVE":
-              setMessages((prev) => [
-                ...prev,
-                {
-                  role: "system",
-                  text: message.text,
-                },
-              ]);
-              break;
+    //         case "WAITING_FOR_REPRESENTATIVE":
+    //           setMessages((prev) => [
+    //             ...prev,
+    //             {
+    //               role: "system",
+    //               text: message.text,
+    //             },
+    //           ]);
+    //           break;
 
-            case "REPRESENTATIVE_CONNECTED":
-              setMessages((prev) => [
-                ...prev,
-                {
-                  role: "system",
-                  text: message.text,
-                },
-              ]);
-              break;
+    //         case "REPRESENTATIVE_CONNECTED":
+    //           setMessages((prev) => [
+    //             ...prev,
+    //             {
+    //               role: "system",
+    //               text: message.text,
+    //             },
+    //           ]);
+    //           break;
 
-            default:
-              console.log(message);
-          }
-        });
+    //         default:
+    //           console.log(message);
+    //       }
+    //     });
 
-        // Show typing indicator while waiting for AI greeting
-        setLoading(true);
+    //     // Show typing indicator while waiting for AI greeting
+    //     setLoading(true);
 
-        startChat();
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-      console.log("mess", messages);
-    }
+    //     startChat();
+    //   } catch (err) {
+    //     console.error(err);
+    //     setLoading(false);
+    //   }
+    //   console.log("mess", messages);
+    // }
 
-    connect();
+    // connect();
 
     return () => {
       disconnectTextSocket();
@@ -137,7 +166,6 @@ export default function ChatWindow({ onClose }) {
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
-
   return (
     <div className="chat-window">
       {/* <div className="chat-header">
@@ -150,11 +178,7 @@ export default function ChatWindow({ onClose }) {
 
       <div className="chat-header">
         <div className="chat-header-left">
-          <img
-            src={icon}
-            alt="Support"
-            className="chat-header-icon"
-          />
+          <img src={icon} alt="Support" className="chat-header-icon" />
 
           <span>Support</span>
         </div>
@@ -183,7 +207,7 @@ export default function ChatWindow({ onClose }) {
 
           return (
             <div key={index} className={`chat-message ${msg.role}`}>
-              {msg.text}
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
             </div>
           );
         })}
