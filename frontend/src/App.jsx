@@ -35,7 +35,7 @@ function App() {
         justifyContent: "space-between",
       }}
     >
-      <VoiceAssistant />
+      <VoiceAssistant company={company} />
       <ChatAssistant company={company} />
     </div>
   );

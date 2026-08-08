@@ -70,9 +70,7 @@ import useConversation from "../../hooks/useConversation";
 import "./VoiceAssistant.css";
 import Kristin from "../../assets/images/Kristin.jpg";
 
-
-
-export default function VoiceAssistant() {
+export default function VoiceAssistant({ company }) {
   const {
     started,
     connected,
@@ -86,6 +84,19 @@ export default function VoiceAssistant() {
   // console.log("spea", speaking);
 
   const [loading, setLoading] = useState(false);
+  const [showGreeting, setShowGreeting] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
+
+  useEffect(() => {
+    const showTimer = setTimeout(() => {
+      setShowGreeting(true);
+      setShowBadge(true);
+    }, 1000);
+
+    return () => {
+      clearTimeout(showTimer);
+    };
+  }, []);
 
   useEffect(() => {
     function handleMessage(event) {
@@ -109,6 +120,8 @@ export default function VoiceAssistant() {
 
     try {
       await startConversation();
+      setShowGreeting(false);
+      setShowBadge(false);
     } catch (err) {
       console.error(err);
     } finally {
@@ -116,50 +129,59 @@ export default function VoiceAssistant() {
     }
   };
 
-
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={handleButtonClick}
-        className={`voice-button ${speaking ? "ai-speaking" : ""}`}
-      >
-        {loading ? (
-          <div className="loader" />
-        ) : speaking ? (
-          // AI is talking 
-        <>
-          {speaking && <span className="ring"></span>}
+      <div className="chat-widget">
+       
+        {/* Floating Button */}
+        <button
+          onClick={handleButtonClick}
+          className={`voice-button ${speaking ? "ai-speaking" : ""}`}
+        >
+          {showBadge  && <span className="voice-badge">1</span>}
+          {loading ? (
+            <div className="loader" />
+          ) : speaking ? (
+            // AI is talking
+            <>
+              {speaking && <span className="ring"></span>}
 
-          <img src={Kristin} className="avatar" />
-        </>
-        ) : listening ? (
-          // User is talking
-          <div className="equalizer">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+              <img src={Kristin} className="avatar" />
+            </>
+          ) : listening ? (
+            // User is talking
+            <div className="equalizer">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          ) : (
+            // Waiting
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10a7 7 0 0 1-14 0" />
+              <path d="M12 19v4" />
+              <path d="M8 23h8" />
+            </svg>
+          )}
+        </button>
+         {showGreeting && company && (
+          <div className="voice-greeting">
+            Hi! I'm {company.receptionistName}, {company.companyName} AI
+            assistant. How can I help you today?
           </div>
-        ) : (
-          // Waiting
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-            <path d="M19 10a7 7 0 0 1-14 0" />
-            <path d="M12 19v4" />
-            <path d="M8 23h8" />
-          </svg>
         )}
-      </button>
+      </div>
     </>
   );
 }

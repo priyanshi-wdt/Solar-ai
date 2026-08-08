@@ -9,7 +9,7 @@ export default function ChatAssistant({ company }) {
   const [showGreeting, setShowGreeting] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     const showTimer = setTimeout(() => {
       setShowGreeting(true);
       setShowBadge(true);
@@ -17,7 +17,6 @@ export default function ChatAssistant({ company }) {
 
     return () => {
       clearTimeout(showTimer);
-      clearTimeout(hideTimer);
     };
   }, []);
 
