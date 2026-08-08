@@ -26,6 +26,9 @@ class GeminiAdapter {
     // flush to the DB once on turnComplete instead of once per chunk)
     this.inputBuffers = new Map();
     this.outputBuffers = new Map();
+
+    // Voice conversation completion state
+    this.completionRequested = new Map();
   }
 
   async create(socket) {
@@ -59,6 +62,18 @@ class GeminiAdapter {
         // Mongo besides raw audio bytes.
         inputAudioTranscription: {},
         outputAudioTranscription: {},
+
+        tools: [
+          {
+            functionDeclarations: [
+              {
+                name: "end_conversation",
+                description:
+                  "End the voice conversation when the customer's request has been fully resolved and the customer has no more questions.",
+              },
+            ],
+          },
+        ],
 
         // speechConfig: {
         //   voiceConfig: {
@@ -107,6 +122,7 @@ class GeminiAdapter {
           this.pending.delete(socket);
           this.inputBuffers.delete(socket);
           this.outputBuffers.delete(socket);
+          this.completionRequested.delete(socket);
         },
 
         onerror: (err) => {
@@ -169,11 +185,11 @@ class GeminiAdapter {
 
     // Typed messages are already text, log immediately.
     await conversationStore.append({
-  socket,
-  role: "user",
-  text,
-  source: "text",
-});
+      socket,
+      role: "user",
+      text,
+      source: "text",
+    });
 
     session.sendClientContent({
       turns: [
@@ -214,9 +230,47 @@ class GeminiAdapter {
     }
 
     const outputTranscript = message.serverContent?.outputTranscription?.text;
+
     if (outputTranscript) {
       const prev = this.outputBuffers.get(socket) || "";
+
       this.outputBuffers.set(socket, prev + outputTranscript);
+    }
+
+    // ---------- Gemini function/tool call ----------
+    if (message.toolCall?.functionCalls) {
+      for (const functionCall of message.toolCall.functionCalls) {
+        console.log("🔧 Gemini called function:", functionCall.name);
+
+        if (functionCall.name === "end_conversation") {
+          console.log("🛑 AI requested conversation end");
+
+          this.completionRequested.set(socket, true);
+
+          const session = this.sessions.get(socket);
+
+          if (session) {
+            session.sendToolResponse({
+              functionResponses: [
+                {
+                  name: functionCall.name,
+                  id: functionCall.id,
+                  response: {
+                    result: "Conversation ending.",
+                  },
+                },
+              ],
+            });
+          }
+
+          // Tell frontend that this conversation should end.
+          socket.send(
+            JSON.stringify({
+              type: "CONVERSATION_COMPLETE",
+            }),
+          );
+        }
+      }
     }
 
     const parts = message.serverContent?.modelTurn?.parts || [];
@@ -272,10 +326,34 @@ class GeminiAdapter {
           source: "voice",
         });
       }
+      // this.inputBuffers.delete(socket);
+      // this.outputBuffers.delete(socket);
+
+      // socket.send(JSON.stringify({ type: "TURN_COMPLETE" }));
       this.inputBuffers.delete(socket);
       this.outputBuffers.delete(socket);
 
-      socket.send(JSON.stringify({ type: "TURN_COMPLETE" }));
+      const shouldEnd = this.completionRequested.get(socket) === true;
+
+      if (shouldEnd) {
+        console.log("🛑 Conversation completed by AI");
+
+        this.completionRequested.delete(socket);
+
+        socket.send(
+          JSON.stringify({
+            type: "CONVERSATION_COMPLETE",
+          }),
+        );
+
+        return;
+      }
+
+      socket.send(
+        JSON.stringify({
+          type: "TURN_COMPLETE",
+        }),
+      );
     }
   }
 

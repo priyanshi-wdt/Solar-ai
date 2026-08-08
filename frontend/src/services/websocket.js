@@ -1,5 +1,5 @@
 import conversationManager from "../conversation/conversationManager";
-import { playPCM, stopAudio } from "../audio/audioPlayer";
+import { playPCM, stopAudio, setOnAudioQueueEmpty } from "../audio/audioPlayer";
 import { companyId } from "../config/company";
 
 let socket = null;
@@ -13,11 +13,31 @@ export async function connectWebSocket() {
 
     socket = new WebSocket(
       `wss://solar-ai-ufc1.onrender.com?companyId=${companyId}&mode=voice`
-      // `ws://localhost:5000?companyId=${companyId}&mode=voice`
-
+      // `ws://localhost:5000?companyId=${companyId}&mode=voice`,
     );
-
     socket.binaryType = "arraybuffer";
+
+    socket.shouldEndConversation = false;
+
+    setOnAudioQueueEmpty(() => {
+      if (!socket) return;
+
+      if (!socket.shouldEndConversation) {
+        return;
+      }
+
+      console.log("🛑 Final AI audio finished");
+
+      socket.shouldEndConversation = false;
+
+      stopAudio();
+
+      // Update UI/state
+      conversationManager.stopConversation();
+
+      // Close WebSocket
+      disconnectWebSocket();
+    });
 
     socket.onopen = () => {
       console.log("✅ WebSocket Connected");
@@ -61,6 +81,14 @@ export async function connectWebSocket() {
 
         case "TURN_COMPLETE":
           conversationManager.onAIFinished();
+
+          break;
+
+        case "CONVERSATION_COMPLETE":
+          console.log("🛑 AI completed the conversation");
+
+          // Tell the audio player that this is the final response.
+          socket.shouldEndConversation = true;
 
           break;
 
@@ -132,7 +160,7 @@ export function stopSession() {
   socket.send(
     JSON.stringify({
       type: "STOP_SESSION",
-    })
+    }),
   );
 }
 

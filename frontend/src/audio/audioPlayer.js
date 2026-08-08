@@ -8,6 +8,9 @@ let audioQueue = [];
 let isPlaying = false;
 let stopped = false;
 
+// Called when the final AI audio has finished playing
+let onAudioQueueEmpty = null;
+
 function getAudioContext() {
   if (!audioContext) {
     audioContext = new AudioContext({
@@ -38,14 +41,19 @@ function playNext() {
   }
 
   if (audioQueue.length === 0) {
-    isPlaying = false;
+  isPlaying = false;
 
-    if (conversationManager.turnComplete) {
-      conversationManager.onAIFinished();
-    }
-
-    return;
+  if (conversationManager.turnComplete) {
+    conversationManager.onAIFinished();
   }
+
+  // Final AI response has completely finished playing
+  if (onAudioQueueEmpty) {
+    onAudioQueueEmpty();
+  }
+
+  return;
+}
 
   isPlaying = true;
 
@@ -110,4 +118,8 @@ export function stopAudio() {
   isPlaying = false;
 
   console.log("🛑 AI Audio Stopped");
+}
+
+export function setOnAudioQueueEmpty(callback) {
+  onAudioQueueEmpty = callback;
 }

@@ -50,60 +50,60 @@ export default function ChatWindow({ onClose }) {
 
   // Connect WebSocket
   useEffect(() => {
-    // async function connect() {
-    //   try {
-    //     await connectTextSocket((message) => {
-    //       switch (message.type) {
-    //         case "TEXT":
-    //           setLoading(false);
+    async function connect() {
+      try {
+        await connectTextSocket((message) => {
+          switch (message.type) {
+            case "TEXT":
+              setLoading(false);
 
-    //           setMessages((prev) => [
-    //             ...prev,
-    //             {
-    //               role: "assistant",
-    //               text: message.text,
-    //             },
-    //           ]);
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "assistant",
+                  text: message.text,
+                },
+              ]);
 
-    //           break;
+              break;
 
-    //         case "WAITING_FOR_REPRESENTATIVE":
-    //           setMessages((prev) => [
-    //             ...prev,
-    //             {
-    //               role: "system",
-    //               text: message.text,
-    //             },
-    //           ]);
-    //           break;
+            case "WAITING_FOR_REPRESENTATIVE":
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "system",
+                  text: message.text,
+                },
+              ]);
+              break;
 
-    //         case "REPRESENTATIVE_CONNECTED":
-    //           setMessages((prev) => [
-    //             ...prev,
-    //             {
-    //               role: "system",
-    //               text: message.text,
-    //             },
-    //           ]);
-    //           break;
+            case "REPRESENTATIVE_CONNECTED":
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "system",
+                  text: message.text,
+                },
+              ]);
+              break;
 
-    //         default:
-    //           console.log(message);
-    //       }
-    //     });
+            default:
+              console.log(message);
+          }
+        });
 
-    //     // Show typing indicator while waiting for AI greeting
-    //     setLoading(true);
+        // Show typing indicator while waiting for AI greeting
+        setLoading(true);
 
-    //     startChat();
-    //   } catch (err) {
-    //     console.error(err);
-    //     setLoading(false);
-    //   }
-    //   console.log("mess", messages);
-    // }
+        startChat();
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
+      console.log("mess", messages);
+    }
 
-    // connect();
+    connect();
 
     return () => {
       disconnectTextSocket();

@@ -2,8 +2,8 @@ const GeminiAdapter = require("./geminiAdapter");
 
 async function handleAudioMessage(socket, audioBuffer) {
   try {
-    console.log("🎤 Audio Chunk");
-    console.log("Bytes:", audioBuffer.length);
+    // console.log("🎤 Audio Chunk");
+    // console.log("Bytes:", audioBuffer.length);
 
     await GeminiAdapter.sendAudio(
       socket,

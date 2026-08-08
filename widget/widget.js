@@ -18,11 +18,25 @@ window.SolarAI = {
       if (event.data?.type === "OPEN_CHAT") {
         iframe.style.width = "380px";
         iframe.style.height = "480px";
+
+        iframe.contentWindow?.postMessage(
+          {
+            type: "OPEN_CHAT",
+          },
+          "*"
+        );
       }
 
       if (event.data?.type === "CLOSE_CHAT") {
         iframe.style.width = "100%";
         iframe.style.height = "110px";
+
+        iframe.contentWindow?.postMessage(
+          {
+            type: "CLOSE_CHAT",
+          },
+          "*"
+        );
       }
     });
   },
